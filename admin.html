@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fire Staff Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+font-family: Arial;
+padding:20px;
+text-align:center;
+}
+
+input, select{
+width:250px;
+height:40px;
+font-size:18px;
+margin:10px;
+}
+
+button{
+height:40px;
+font-size:18px;
+margin:10px;
+}
+
+.staffRow{
+margin:10px;
+padding:10px;
+border:1px solid #ccc;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Staff Management</h1>
+
+<div>
+
+<input id="name" placeholder="Staff name">
+
+<br>
+
+<select id="area">
+
+<option value="BDC_PICKING">BDC Picking</option>
+<option value="BDC_MHE">BDC MHE</option>
+<option value="BDC_INBOUND">BDC Inbound</option>
+<option value="BDC_DESPATCH">BDC Despatch</option>
+<option value="BDC_STOCK">BDC Stock</option>
+<option value="BDC_SUPERVISORS">BDC Supervisors</option>
+<option value="BDC_MANAGERS">BDC Managers</option>
+
+<option value="CDC_PICKING">CDC Picking</option>
+<option value="CDC_MHE">CDC MHE</option>
+<option value="CDC_INBOUND">CDC Inbound</option>
+<option value="CDC_DESPATCH">CDC Despatch</option>
+<option value="CDC_STOCK">CDC Stock</option>
+<option value="CDC_SUPERVISORS">CDC Supervisors</option>
+<option value="CDC_MANAGERS">CDC Managers</option>
+
+</select>
+
+<br>
+
+<button onclick="addStaff()">Add Staff</button>
+
+</div>
+
+<h2>Current Staff</h2>
+
+<div id="staffList"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyACwPAzBK_TFOyIuuI0iNzy_9zW-CKA7m4",
+  authDomain: "shunt-queue.firebaseapp.com",
+  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "shunt-queue",
+  storageBucket: "shunt-queue.appspot.com",
+  messagingSenderId: "773776993625",
+  appId: "1:773776993625:web:2082ee7a38be041bee7048"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+}
+
+const app = initializeApp(firebaseConfig)
+const db = getDatabase(app)
+
+const staffRef = ref(db,"fireStaff")
+
+function addStaff(){
+
+const name = document.getElementById("name").value
+const area = document.getElementById("area").value
+
+push(staffRef,{
+name:name,
+area:area
+})
+
+document.getElementById("name").value=""
+
+}
+
+onValue(staffRef,(snapshot)=>{
+
+const data = snapshot.val()
+
+const list = document.getElementById("staffList")
+list.innerHTML=""
+
+for(const id in data){
+
+const row = document.createElement("div")
+row.className="staffRow"
+
+row.innerHTML = data[id].name + " — " + data[id].area +
+' <button onclick="deleteStaff(\''+id+'\')">Delete</button>'
+
+list.appendChild(row)
+
+}
+
+})
+
+window.deleteStaff = function(id){
+
+remove(ref(db,"fireStaff/"+id))
+
+}
+
+</script>
+
+</body>
+</html>
