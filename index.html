@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>Fire Management System</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#d32f2f">
 
 <style>
 
 body{
-font-family: Arial;
+font-family:Arial;
 text-align:center;
 padding:30px;
 background:#f5f5f5;
@@ -30,9 +36,10 @@ cursor:pointer;
 .shiftBtn{background:#2196F3;color:white;}
 .rollcallBtn{background:#4CAF50;color:white;}
 .adminBtn{background:#555;color:white;}
+.reportBtn{background:#9c27b0;color:white;}
 
 .statusPanel{
-max-width:400px;
+max-width:420px;
 margin:20px auto;
 padding:16px;
 background:white;
@@ -41,17 +48,18 @@ border-radius:10px;
 }
 
 .bigNumber{
-font-size:26px;
+font-size:28px;
 font-weight:bold;
 margin-top:6px;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<h1>Fire Management System</h1>
+<h1>🔥 Fire Management System</h1>
 
 <div class="statusPanel">
 
@@ -75,6 +83,12 @@ Accounted
 
 <a href="rollcall.html">
 <button class="rollcallBtn">Fire Roll Call</button>
+</a>
+
+<br>
+
+<a href="report.html">
+<button class="reportBtn">Drill Reports</button>
 </a>
 
 <br>
@@ -105,11 +119,14 @@ const rosterRef=ref(db,"activeShift")
 const shiftRef=ref(db,"shiftInfo")
 
 onValue(shiftRef,(snap)=>{
+
 const data=snap.val()||{}
+
 if(data.shift){
 document.getElementById("shiftStatus").innerText=
 "Shift: "+data.shift+" "+data.team
 }
+
 })
 
 onValue(rosterRef,(snap)=>{
