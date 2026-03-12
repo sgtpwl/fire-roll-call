@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
 body{
 font-family: Arial;
 padding:20px;
@@ -31,7 +30,6 @@ padding:10px;
 border:1px solid #ccc;
 font-size:15px;
 }
-
 </style>
 </head>
 
@@ -43,8 +41,7 @@ font-size:15px;
 
 <br>
 
-<select id="department" onchange="updateRole()">
-
+<select id="department" onchange="updateRole(); updateSite();">
 <option value="">Select Department</option>
 
 <option value="BDC Picking">BDC Picking</option>
@@ -66,13 +63,21 @@ font-size:15px;
 <option value="Yard Gatehouse">Yard Gatehouse</option>
 
 <option value="Compliance">Compliance</option>
-
 </select>
 
 <br>
 
 <select id="role">
-<option>Select Role</option>
+<option value="">Select Role</option>
+</select>
+
+<br>
+
+<select id="site">
+<option value="">Select Site</option>
+<option value="BDC">BDC</option>
+<option value="CDC">CDC</option>
+<option value="YARD">Yard</option>
 </select>
 
 <br>
@@ -103,15 +108,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-authDomain: "shunt-queue.firebaseapp.com",
-databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-projectId: "shunt-queue",
-storageBucket: "shunt-queue.appspot.com",
-messagingSenderId: "773776993625",
-appId: "1:773776993625:web:2082ee7a38be041bee7048"
-
+  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+  authDomain: "shunt-queue.firebaseapp.com",
+  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "shunt-queue",
+  storageBucket: "shunt-queue.appspot.com",
+  messagingSenderId: "773776993625",
+  appId: "1:773776993625:web:2082ee7a38be041bee7048"
 }
 
 const app = initializeApp(firebaseConfig)
@@ -121,60 +124,61 @@ const staffRef = ref(db,"fireStaff")
 
 document.getElementById("addBtn").onclick = function(){
 
-const name = document.getElementById("name").value
-const department = document.getElementById("department").value
-const role = document.getElementById("role").value
-const shift = document.getElementById("shift").value
-const team = document.getElementById("team").value
+  const name = document.getElementById("name").value.trim()
+  const department = document.getElementById("department").value
+  const role = document.getElementById("role").value
+  const site = document.getElementById("site").value
+  const shift = document.getElementById("shift").value
+  const team = document.getElementById("team").value
 
-if(name==="") return
+  if(name === "" || department === "" || role === "" || site === ""){
+    alert("Please complete name, department, role and site")
+    return
+  }
 
-push(staffRef,{
-name:name,
-department:department,
-role:role,
-shift:shift,
-team:team
-})
+  push(staffRef,{
+    name:name,
+    department:department,
+    role:role,
+    site:site,
+    shift:shift,
+    team:team
+  })
 
-document.getElementById("name").value=""
-
+  document.getElementById("name").value = ""
 }
 
 onValue(staffRef,(snapshot)=>{
 
-const data = snapshot.val()
+  const data = snapshot.val()
+  const list = document.getElementById("staffList")
+  list.innerHTML = ""
 
-const list = document.getElementById("staffList")
-list.innerHTML=""
+  if(!data){
+    list.innerHTML = "No staff added yet"
+    return
+  }
 
-if(!data){
-list.innerHTML="No staff added yet"
-return
-}
+  for(const id in data){
 
-for(const id in data){
+    const row = document.createElement("div")
+    row.className = "staffRow"
 
-const row = document.createElement("div")
-row.className="staffRow"
+    row.innerHTML =
+      data[id].name + " — " +
+      data[id].department + " — " +
+      data[id].role + " — " +
+      data[id].site + " — " +
+      data[id].shift + " " + data[id].team +
+      ' <button onclick="deleteStaff(\''+id+'\')">Delete</button>'
 
-row.innerHTML =
-data[id].name + " — " +
-data[id].department + " — " +
-data[id].role + " — " +
-data[id].shift + " " +
-data[id].team +
-
-' <button onclick="deleteStaff(\''+id+'\')">Delete</button>'
-
-list.appendChild(row)
-
-}
+    list.appendChild(row)
+  }
 
 })
 
 window.deleteStaff = function(id){
-remove(ref(db,"fireStaff/"+id))
+  remove(ref(db,"fireStaff/"+id))
 }
 
 </script>
@@ -183,38 +187,60 @@ remove(ref(db,"fireStaff/"+id))
 
 function updateRole(){
 
-const dept = document.getElementById("department").value
-const roleSelect = document.getElementById("role")
+  const dept = document.getElementById("department").value
+  const roleSelect = document.getElementById("role")
 
-roleSelect.innerHTML=""
+  roleSelect.innerHTML = ""
 
-if(dept.includes("Picking") || dept.includes("MHE") || dept.includes("Despatch") || dept.includes("Inbound")){
-roleSelect.innerHTML='<option value="GWO">GWO</option>'
+  if(
+    dept.includes("Picking") ||
+    dept.includes("MHE") ||
+    dept.includes("Despatch") ||
+    dept.includes("Inbound")
+  ){
+    roleSelect.innerHTML = '<option value="GWO">GWO</option>'
+  }
+  else if(dept.includes("Stock")){
+    roleSelect.innerHTML = '<option value="Stock Controller">Stock Controller</option>'
+  }
+  else if(dept === "Supervisor"){
+    roleSelect.innerHTML = '<option value="Supervisor">Supervisor</option>'
+  }
+  else if(dept === "Manager"){
+    roleSelect.innerHTML = '<option value="Manager">Manager</option>'
+  }
+  else if(dept === "Yard Shunters"){
+    roleSelect.innerHTML = '<option value="Shunter">Shunter</option>'
+  }
+  else if(dept === "Yard Gatehouse"){
+    roleSelect.innerHTML = '<option value="Gatehouse">Gatehouse</option>'
+  }
+  else if(dept === "Compliance"){
+    roleSelect.innerHTML = '<option value="Trainer">Trainer</option>'
+  }
+  else{
+    roleSelect.innerHTML = '<option value="">Select Role</option>'
+  }
+
 }
 
-else if(dept.includes("Stock")){
-roleSelect.innerHTML='<option value="Stock Controller">Stock Controller</option>'
-}
+function updateSite(){
 
-else if(dept==="Supervisor"){
-roleSelect.innerHTML='<option value="Supervisor">Supervisor</option>'
-}
+  const dept = document.getElementById("department").value
+  const siteSelect = document.getElementById("site")
 
-else if(dept==="Manager"){
-roleSelect.innerHTML='<option value="Manager">Manager</option>'
-}
-
-else if(dept==="Yard Shunters"){
-roleSelect.innerHTML='<option value="Shunter">Shunter</option>'
-}
-
-else if(dept==="Yard Gatehouse"){
-roleSelect.innerHTML='<option value="Gatehouse">Gatehouse</option>'
-}
-
-else if(dept==="Compliance"){
-roleSelect.innerHTML='<option value="Trainer">Trainer</option>'
-}
+  if(dept.startsWith("BDC")){
+    siteSelect.value = "BDC"
+  }
+  else if(dept.startsWith("CDC")){
+    siteSelect.value = "CDC"
+  }
+  else if(dept.startsWith("Yard")){
+    siteSelect.value = "YARD"
+  }
+  else{
+    siteSelect.value = ""
+  }
 
 }
 
