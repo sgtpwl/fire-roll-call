@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 body{
 font-family:Arial;
 margin:0;
@@ -14,61 +15,80 @@ background:#f5f5f5;
 
 h1{
 text-align:center;
-margin-top:0;
 }
 
-.reportCard{
+.filters{
+text-align:center;
+margin-bottom:20px;
+}
+
+.filters button{
+margin:5px;
+padding:10px 14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#1976d2;
+color:white;
+}
+
+.report{
 max-width:900px;
-margin:20px auto;
+margin:12px auto;
 background:white;
 border:1px solid #ccc;
-border-radius:10px;
-padding:16px;
+border-radius:8px;
+overflow:hidden;
 }
 
-.reportTitle{
-font-size:22px;
+.reportHeader{
+padding:14px;
 font-weight:bold;
-margin-bottom:10px;
-}
-
-.reportMeta{
-margin:6px 0;
-}
-
-.staffTable{
-width:100%;
-border-collapse:collapse;
-margin-top:12px;
-}
-
-.staffTable th,
-.staffTable td{
-border:1px solid #ddd;
-padding:8px;
-text-align:left;
-font-size:14px;
-}
-
-.staffTable th{
+cursor:pointer;
 background:#ececec;
 }
 
-.noReports{
-max-width:900px;
-margin:20px auto;
-background:white;
-border:1px solid #ccc;
-border-radius:10px;
-padding:16px;
-text-align:center;
+.reportSummary{
+font-size:14px;
+margin-top:4px;
 }
+
+.reportBody{
+display:none;
+padding:14px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:6px;
+font-size:13px;
+}
+
+th{
+background:#f0f0f0;
+}
+
 </style>
 </head>
 
 <body>
 
 <h1>📋 Drill Reports</h1>
+
+<div class="filters">
+
+<button onclick="setFilter('week')">This Week</button>
+<button onclick="setFilter('month')">This Month</button>
+<button onclick="setFilter('year')">This Year</button>
+<button onclick="setFilter('all')">All</button>
+
+</div>
 
 <div id="reports"></div>
 
@@ -92,80 +112,129 @@ const db=getDatabase(app)
 
 const reportsRef=ref(db,"drillReports")
 
-function formatDateTime(ts){
-const d=new Date(ts)
-return d.toLocaleString()
+let allReports=[]
+let currentFilter="all"
+
+function formatDate(ts){
+return new Date(ts).toLocaleString()
 }
+
+function setFilter(type){
+currentFilter=type
+renderReports()
+}
+
+window.setFilter=setFilter
 
 onValue(reportsRef,(snap)=>{
 
 const data=snap.val()||{}
+allReports=[]
+
+for(const id in data){
+allReports.push(data[id])
+}
+
+allReports.sort((a,b)=>b.startTime-a.startTime)
+
+renderReports()
+
+})
+
+function renderReports(){
+
 const container=document.getElementById("reports")
 container.innerHTML=""
 
-const reports=[]
+let reports=[...allReports]
 
-for(const id in data){
-reports.push({
-id:id,
-...data[id]
-})
+const now=new Date()
+
+if(currentFilter==="week"){
+const weekAgo=new Date()
+weekAgo.setDate(now.getDate()-7)
+reports=reports.filter(r=>r.startTime>weekAgo.getTime())
 }
 
-reports.sort((a,b)=>(b.startTime||0)-(a.startTime||0))
+if(currentFilter==="month"){
+const monthAgo=new Date()
+monthAgo.setMonth(now.getMonth()-1)
+reports=reports.filter(r=>r.startTime>monthAgo.getTime())
+}
 
-if(reports.length===0){
-container.innerHTML='<div class="noReports">No drill reports yet.</div>'
-return
+if(currentFilter==="year"){
+const yearAgo=new Date()
+yearAgo.setFullYear(now.getFullYear()-1)
+reports=reports.filter(r=>r.startTime>yearAgo.getTime())
 }
 
 reports.forEach(report=>{
 
 const card=document.createElement("div")
-card.className="reportCard"
+card.className="report"
 
-let staffRows=""
+const header=document.createElement("div")
+header.className="reportHeader"
 
-;(report.staff||[]).forEach(person=>{
+header.innerHTML=`
+${formatDate(report.startTime)} — ${report.shift} ${report.team}
+<div class="reportSummary">
+${report.staffTotal} staff • ${report.totalTimeText}
+</div>
+`
 
-staffRows+=`
+const body=document.createElement("div")
+body.className="reportBody"
+
+let rows=""
+
+(report.staff||[]).forEach(p=>{
+
+rows+=`
 <tr>
-<td>${person.name||""}</td>
-<td>${person.site||""}</td>
-<td>${person.department||""}</td>
-<td>${person.safeTime ? formatDateTime(person.safeTime) : ""}</td>
+<td>${p.name}</td>
+<td>${p.site}</td>
+<td>${p.department}</td>
+<td>${p.safeTime ? formatDate(p.safeTime) : "-"}</td>
 </tr>
 `
+
 })
 
-card.innerHTML=`
-<div class="reportTitle">Fire Drill Report</div>
-<div class="reportMeta"><strong>Shift:</strong> ${report.shift||"-"} Shift ${report.team||"-"}</div>
-<div class="reportMeta"><strong>Start Time:</strong> ${report.startTime ? formatDateTime(report.startTime) : "-"}</div>
-<div class="reportMeta"><strong>End Time:</strong> ${report.endTime ? formatDateTime(report.endTime) : "-"}</div>
-<div class="reportMeta"><strong>Total Time:</strong> ${report.totalTimeText||"-"}</div>
-<div class="reportMeta"><strong>Staff on Site:</strong> ${report.staffTotal||0}</div>
+body.innerHTML=`
+Start: ${formatDate(report.startTime)}<br>
+End: ${formatDate(report.endTime)}<br>
+Total Time: ${report.totalTimeText}
 
-<table class="staffTable">
-<thead>
+<table>
 <tr>
 <th>Name</th>
 <th>Site</th>
 <th>Department</th>
-<th>Marked Safe</th>
+<th>Safe Time</th>
 </tr>
-</thead>
-<tbody>
-${staffRows}
-</tbody>
+${rows}
 </table>
 `
+
+header.onclick=()=>{
+
+if(body.style.display==="block"){
+body.style.display="none"
+}else{
+body.style.display="block"
+}
+
+}
+
+card.appendChild(header)
+card.appendChild(body)
 
 container.appendChild(card)
 
 })
 
-})
+}
 
 </script>
 
