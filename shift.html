@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Shift Setup</title>
+<title>Shift Roster</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 
 body{
 font-family: Arial;
-text-align:center;
 padding:20px;
+text-align:center;
 }
 
-select{
-width:200px;
+select, input{
+width:220px;
 height:40px;
 font-size:16px;
-margin:10px;
+margin:8px;
 }
 
 button{
 height:40px;
 font-size:16px;
-margin:10px;
+margin:6px;
 }
 
 .staffRow{
@@ -38,7 +38,7 @@ font-size:15px;
 
 <body>
 
-<h1>Shift Setup</h1>
+<h1>Shift Roster</h1>
 
 <select id="shift">
 <option value="Days">Days</option>
@@ -52,20 +52,30 @@ font-size:15px;
 
 <br>
 
-<button onclick="loadStaff()">Load Staff</button>
+<button onclick="activateShift()">Activate Shift</button>
 
-<h2>Staff On Shift</h2>
+<h2>Search Staff</h2>
 
-<div id="staffList"></div>
+<input id="searchBox" placeholder="Search name" onkeyup="searchStaff()">
 
-<br>
+<div id="searchResults"></div>
 
-<button onclick="startShift()">START SHIFT</button>
+<h2>Add Temporary Worker</h2>
+
+<input id="tempName" placeholder="Name">
+
+<input id="tempDept" placeholder="Department">
+
+<button onclick="addTemp()">Add Temporary</button>
+
+<h2>Staff Currently On Site</h2>
+
+<div id="roster"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
 
 const firebaseConfig = {
 
@@ -83,76 +93,113 @@ const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
 
 const staffRef = ref(db,"fireStaff")
+const rosterRef = ref(db,"activeShift")
+const shiftInfoRef = ref(db,"shiftInfo")
 
-window.loadStaff = function(){
-
-const shift = document.getElementById("shift").value
-const team = document.getElementById("team").value
+let staffData = {}
 
 onValue(staffRef,(snapshot)=>{
+staffData = snapshot.val() || {}
+})
 
-const data = snapshot.val()
+window.activateShift=function(){
 
-const list = document.getElementById("staffList")
-list.innerHTML=""
+const shift=document.getElementById("shift").value
+const team=document.getElementById("team").value
 
-for(const id in data){
+set(shiftInfoRef,{
+shift:shift,
+team:team
+})
 
-if(data[id].shift===shift && data[id].team===team){
+alert("Shift Activated")
+
+}
+
+window.searchStaff=function(){
+
+const search=document.getElementById("searchBox").value.toLowerCase()
+
+const results=document.getElementById("searchResults")
+results.innerHTML=""
+
+if(search.length<2) return
+
+for(const id in staffData){
+
+const person=staffData[id]
+
+if(person.name.toLowerCase().includes(search)){
 
 const row=document.createElement("div")
 row.className="staffRow"
 
-const checkbox=document.createElement("input")
-checkbox.type="checkbox"
-checkbox.checked=true
+row.innerHTML=person.name+" — "+person.department+
+' <button onclick="addToRoster(\''+person.name+'\',\''+person.department+'\',\''+person.site+'\')">Add</button>'
 
-checkbox.dataset.name=data[id].name
-checkbox.dataset.department=data[id].department
-checkbox.dataset.site=data[id].site
-
-row.appendChild(checkbox)
-
-row.innerHTML+=
-" "+data[id].name+
-" — "+data[id].department+
-" ("+data[id].site+")"
-
-list.appendChild(row)
+results.appendChild(row)
 
 }
 
 }
 
-})
-
 }
 
-window.startShift=function(){
+window.addToRoster=function(name,dept,site){
 
-const checkboxes=document.querySelectorAll("#staffList input")
-
-let active=[]
-
-checkboxes.forEach(box=>{
-
-if(box.checked){
-
-active.push({
-name:box.dataset.name,
-department:box.dataset.department,
-site:box.dataset.site,
+push(rosterRef,{
+name:name,
+department:dept,
+site:site,
 safe:false
 })
 
 }
 
+window.addTemp=function(){
+
+const name=document.getElementById("tempName").value
+const dept=document.getElementById("tempDept").value
+
+if(name==="") return
+
+push(rosterRef,{
+name:name,
+department:dept,
+site:"TEMP",
+safe:false
 })
 
-set(ref(db,"activeShift"),active)
+document.getElementById("tempName").value=""
+document.getElementById("tempDept").value=""
 
-alert("Shift started successfully")
+}
 
+onValue(rosterRef,(snapshot)=>{
+
+const data=snapshot.val()
+
+const list=document.getElementById("roster")
+list.innerHTML=""
+
+if(!data) return
+
+for(const id in data){
+
+const row=document.createElement("div")
+row.className="staffRow"
+
+row.innerHTML=data[id].name+" — "+data[id].department+
+' <button onclick="removeStaff(\''+id+'\')">Remove</button>'
+
+list.appendChild(row)
+
+}
+
+})
+
+window.removeStaff=function(id){
+remove(ref(db,"activeShift/"+id))
 }
 
 </script>
