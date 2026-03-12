@@ -33,7 +33,6 @@ font-size:15px;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -44,19 +43,37 @@ font-size:15px;
 
 <br>
 
-<select id="site">
-<option value="BDC">BDC</option>
-<option value="CDC">CDC</option>
-<option value="YARD">Yard</option>
+<select id="department" onchange="updateRole()">
+
+<option value="">Select Department</option>
+
+<option value="BDC Picking">BDC Picking</option>
+<option value="BDC MHE">BDC MHE</option>
+<option value="BDC Despatch">BDC Despatch</option>
+<option value="BDC Inbound">BDC Inbound</option>
+<option value="BDC Stock">BDC Stock Team</option>
+
+<option value="CDC Picking">CDC Picking</option>
+<option value="CDC MHE">CDC MHE</option>
+<option value="CDC Despatch">CDC Despatch</option>
+<option value="CDC Inbound">CDC Inbound</option>
+<option value="CDC Stock">CDC Stock Team</option>
+
+<option value="Supervisor">Supervisor</option>
+<option value="Manager">Manager</option>
+
+<option value="Yard Shunters">Yard Shunters</option>
+<option value="Yard Gatehouse">Yard Gatehouse</option>
+
+<option value="Compliance Trainer">Compliance Trainer</option>
+
 </select>
 
 <br>
 
-<input id="department" placeholder="Department (Picking, MHE etc)">
-
-<br>
-
-<input id="role" placeholder="Role (GWO, Supervisor etc)">
+<select id="role">
+<option>Select Role</option>
+</select>
 
 <br>
 
@@ -105,7 +122,6 @@ const staffRef = ref(db,"fireStaff")
 document.getElementById("addBtn").onclick = function(){
 
 const name = document.getElementById("name").value
-const site = document.getElementById("site").value
 const department = document.getElementById("department").value
 const role = document.getElementById("role").value
 const shift = document.getElementById("shift").value
@@ -115,7 +131,6 @@ if(name==="") return
 
 push(staffRef,{
 name:name,
-site:site,
 department:department,
 role:role,
 shift:shift,
@@ -145,8 +160,8 @@ row.className="staffRow"
 
 row.innerHTML =
 data[id].name + " — " +
-data[id].site + " / " +
-data[id].department + " / " +
+data[id].department + " — " +
+data[id].role + " — " +
 data[id].shift + " " +
 data[id].team +
 
@@ -159,8 +174,47 @@ list.appendChild(row)
 })
 
 window.deleteStaff = function(id){
-
 remove(ref(db,"fireStaff/"+id))
+}
+
+</script>
+
+<script>
+
+function updateRole(){
+
+const dept = document.getElementById("department").value
+const roleSelect = document.getElementById("role")
+
+roleSelect.innerHTML=""
+
+if(dept.includes("Picking") || dept.includes("MHE") || dept.includes("Despatch") || dept.includes("Inbound")){
+roleSelect.innerHTML='<option value="GWO">GWO</option>'
+}
+
+else if(dept.includes("Stock")){
+roleSelect.innerHTML='<option value="Stock Controller">Stock Controller</option>'
+}
+
+else if(dept==="Supervisor"){
+roleSelect.innerHTML='<option value="Supervisor">Supervisor</option>'
+}
+
+else if(dept==="Manager"){
+roleSelect.innerHTML='<option value="Manager">Manager</option>'
+}
+
+else if(dept==="Yard Shunters"){
+roleSelect.innerHTML='<option value="Shunter">Shunter</option>'
+}
+
+else if(dept==="Yard Gatehouse"){
+roleSelect.innerHTML='<option value="Gatehouse">Gatehouse</option>'
+}
+
+else if(dept==="Compliance Trainer"){
+roleSelect.innerHTML='<option value="Trainer">Trainer</option>'
+}
 
 }
 
