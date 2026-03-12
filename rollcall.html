@@ -6,146 +6,190 @@
 
 <style>
 body{
-font-family:Arial;
-margin:0;
-padding:20px;
-background:#f5f5f5;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f5f5f5;
 }
 
 h1{
-text-align:center;
-margin-top:0;
+  text-align: center;
+  margin-top: 0;
 }
 
 .statusBanner{
-text-align:center;
-font-size:26px;
-font-weight:bold;
-padding:14px;
-border-radius:10px;
-margin:10px auto 20px auto;
-max-width:900px;
-color:white;
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 10px;
+  margin: 10px auto 20px auto;
+  max-width: 900px;
+  color: white;
 }
 
 .safeBanner{
-background:#4CAF50;
+  background: #4CAF50;
 }
 
 .missingBanner{
-background:#d32f2f;
+  background: #d32f2f;
 }
 
 .headerBox{
-max-width:900px;
-margin:0 auto 20px auto;
-padding:12px;
-background:white;
-border:1px solid #ccc;
-border-radius:8px;
-text-align:center;
+  max-width: 900px;
+  margin: 0 auto 20px auto;
+  padding: 12px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
 }
 
 .counts{
-font-size:20px;
-margin-top:6px;
+  font-size: 20px;
+  margin-top: 6px;
 }
 
-.resetBtn{
-margin-top:10px;
-padding:12px 20px;
-font-size:16px;
-border:none;
-border-radius:6px;
-background:#ff9800;
-cursor:pointer;
+.progressContainer{
+  max-width: 900px;
+  margin: 10px auto 0 auto;
+  background: #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 24px;
+}
+
+.progressBar{
+  height: 24px;
+  width: 0%;
+  background: #4CAF50;
+  transition: width 0.2s ease;
+}
+
+.progressText{
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.timerText{
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.startBtn{
+  margin-top: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #ff9800;
+  cursor: pointer;
+}
+
+.endBtn{
+  margin-top: 10px;
+  margin-left: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
 }
 
 .section{
-max-width:900px;
-margin:20px auto;
+  max-width: 900px;
+  margin: 20px auto;
 }
 
 .siteTitle{
-font-size:24px;
-font-weight:bold;
-margin:18px 0 8px 0;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 18px 0 8px 0;
 }
 
 .deptBlock{
-border:1px solid #ccc;
-border-radius:8px;
-margin:10px 0;
-background:white;
-overflow:hidden;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px 0;
+  background: white;
+  overflow: hidden;
 }
 
 .deptHeader{
-background:#ececec;
-padding:12px;
-font-weight:bold;
-cursor:pointer;
+  background: #ececec;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .deptBody{
-padding:10px;
-display:none;
+  padding: 10px;
+  display: none;
 }
 
 .personRow{
-border:1px solid #ddd;
-border-radius:6px;
-margin:8px 0;
-padding:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;
-gap:10px;
-flex-wrap:wrap;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin: 8px 0;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .personName{
-font-weight:bold;
-font-size:16px;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .safeBtn{
-padding:8px 14px;
-border:none;
-border-radius:6px;
-background:#e0e0e0;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #e0e0e0;
 }
 
 .safeBtn.safe{
-background:#4CAF50;
-color:white;
+  background: #4CAF50;
+  color: white;
 }
 
 .missingBox{
-max-width:900px;
-margin:20px auto;
-padding:12px;
-background:white;
-border:1px solid #ccc;
-border-radius:8px;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 12px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
 .missingTitle{
-font-weight:bold;
-margin-bottom:6px;
+  font-weight: bold;
+  margin-bottom: 6px;
 }
 
 @media (max-width:700px){
-.personRow{
-flex-direction:column;
-align-items:flex-start;
-}
+  .personRow{
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.safeBtn{
-margin-top:8px;
-width:100%;
-}
+  .safeBtn{
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  .endBtn{
+    margin-left: 0;
+  }
 }
 </style>
 </head>
@@ -155,344 +199,367 @@ width:100%;
 <h1>🔥 Fire Roll Call</h1>
 
 <div id="statusBanner" class="statusBanner missingBanner">
-Waiting for drill
+  Waiting for drill
 </div>
 
 <div class="headerBox">
-<div id="shiftDisplay">Shift: —</div>
+  <div id="shiftDisplay">Shift: —</div>
 
-<div class="counts">
-Accounted <span id="safeCount">0</span> /
-<span id="totalCount">0</span>
-</div>
+  <div class="counts">
+    Accounted <span id="safeCount">0</span> /
+    <span id="totalCount">0</span>
+  </div>
 
-<div id="drillTimer" style="margin-top:8px;font-weight:bold;">Drill not started</div>
+  <div class="progressContainer">
+    <div id="progressBar" class="progressBar"></div>
+  </div>
 
-<button class="resetBtn" onclick="startDrill()">START DRILL</button>
+  <div id="progressText" class="progressText">0 of 0 accounted</div>
+  <div id="drillTimer" class="timerText">Drill not started</div>
+
+  <button class="startBtn" onclick="startDrill()">START DRILL</button>
+  <button class="endBtn" onclick="endDrillManual()">END DRILL / GENERATE REPORT</button>
 </div>
 
 <div id="board" class="section"></div>
 
 <div class="missingBox">
-<div class="missingTitle">Missing</div>
-<div id="missingList">None</div>
+  <div class="missingTitle">Missing</div>
+  <div id="missingList">None</div>
 </div>
 
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, update, set, push, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
-import { getDatabase, ref, onValue, update, set, push, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+const firebaseConfig = {
+  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+  authDomain: "shunt-queue.firebaseapp.com",
+  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "shunt-queue",
+  storageBucket: "shunt-queue.appspot.com",
+  messagingSenderId: "773776993625",
+  appId: "1:773776993625:web:2082ee7a38be041bee7048"
+};
 
-const firebaseConfig={
-apiKey:"AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-authDomain:"shunt-queue.firebaseapp.com",
-databaseURL:"https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-projectId:"shunt-queue",
-storageBucket:"shunt-queue.appspot.com",
-messagingSenderId:"773776993625",
-appId:"1:773776993625:web:2082ee7a38be041bee7048"
-}
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-const app=initializeApp(firebaseConfig)
-const db=getDatabase(app)
+const rosterRef = ref(db, "activeShift");
+const shiftInfoRef = ref(db, "shiftInfo");
+const currentDrillRef = ref(db, "currentDrill");
+const reportsRef = ref(db, "drillReports");
 
-const rosterRef=ref(db,"activeShift")
-const shiftInfoRef=ref(db,"shiftInfo")
-const currentDrillRef=ref(db,"currentDrill")
-const reportsRef=ref(db,"drillReports")
+let rosterData = {};
+let shiftInfo = {};
+let currentDrill = {};
+let openDepartments = {};
+let timerInterval = null;
+let reportAlreadyGenerated = false;
 
-let rosterData={}
-let openDepartments={}
-let currentDrill={}
-let shiftInfo={}
-let timerInterval=null
+onValue(shiftInfoRef, (snap) => {
+  shiftInfo = snap.val() || {};
+  if(shiftInfo.shift){
+    document.getElementById("shiftDisplay").innerText =
+      "Shift: " + shiftInfo.shift + " Shift " + shiftInfo.team;
+  } else {
+    document.getElementById("shiftDisplay").innerText = "Shift: —";
+  }
+});
 
-onValue(shiftInfoRef,(snap)=>{
-shiftInfo=snap.val()||{}
-if(shiftInfo.shift){
-document.getElementById("shiftDisplay").innerText=
-"Shift: "+shiftInfo.shift+" Shift "+shiftInfo.team
-}else{
-document.getElementById("shiftDisplay").innerText="Shift: —"
-}
-})
+onValue(currentDrillRef, (snap) => {
+  currentDrill = snap.val() || {};
+  reportAlreadyGenerated = !!currentDrill.reportGenerated;
+  renderTimer();
+});
 
-onValue(currentDrillRef,(snap)=>{
-currentDrill=snap.val()||{}
-renderTimer()
-})
-
-onValue(rosterRef,(snapshot)=>{
-rosterData=snapshot.val()||{}
-renderBoard()
-checkForDrillCompletion()
-})
-
-function formatDateTime(ts){
-const d=new Date(ts)
-return d.toLocaleString()
-}
+onValue(rosterRef, (snap) => {
+  rosterData = snap.val() || {};
+  renderBoard();
+  checkForDrillCompletion();
+});
 
 function formatDuration(ms){
-const totalSeconds=Math.floor(ms/1000)
-const minutes=Math.floor(totalSeconds/60)
-const seconds=totalSeconds%60
-return minutes+"m "+seconds+"s"
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes + "m " + seconds + "s";
+}
+
+function formatDateTime(ts){
+  return new Date(ts).toLocaleString();
 }
 
 function renderTimer(){
-const timer=document.getElementById("drillTimer")
+  const timer = document.getElementById("drillTimer");
 
-if(timerInterval){
-clearInterval(timerInterval)
-timerInterval=null
-}
+  if(timerInterval){
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
-if(currentDrill.startTime && !currentDrill.endTime){
-const updateTimer=()=>{
-const now=Date.now()
-timer.innerText="Drill running: "+formatDuration(now-currentDrill.startTime)
-}
-updateTimer()
-timerInterval=setInterval(updateTimer,1000)
-}else if(currentDrill.startTime && currentDrill.endTime){
-timer.innerText="Last drill: "+formatDuration(currentDrill.endTime-currentDrill.startTime)
-}else{
-timer.innerText="Drill not started"
-}
+  if(currentDrill.startTime && !currentDrill.endTime){
+    const updateTimer = () => {
+      timer.innerText = "Drill running: " + formatDuration(Date.now() - currentDrill.startTime);
+    };
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+  } else if(currentDrill.startTime && currentDrill.endTime){
+    timer.innerText = "Last drill time: " + formatDuration(currentDrill.endTime - currentDrill.startTime);
+  } else {
+    timer.innerText = "Drill not started";
+  }
 }
 
 function renderBoard(){
+  const board = document.getElementById("board");
+  board.innerHTML = "";
 
-const board=document.getElementById("board")
-board.innerHTML=""
+  const grouped = {};
+  const missing = [];
 
-const grouped={}
-const missing=[]
+  let safeCount = 0;
+  let total = 0;
 
-let safeCount=0
-let total=0
+  for(const id in rosterData){
+    const p = rosterData[id];
+    const site = p.site || "Unknown";
+    const dept = p.department || "Unknown";
 
-for(const id in rosterData){
+    if(!grouped[site]) grouped[site] = {};
+    if(!grouped[site][dept]) grouped[site][dept] = [];
 
-const p=rosterData[id]
+    grouped[site][dept].push({
+      id: id,
+      name: p.name || "",
+      site: p.site || "",
+      department: p.department || "",
+      safe: !!p.safe,
+      safeTime: p.safeTime || null
+    });
 
-const site=p.site||"Unknown"
-const dept=p.department||"Unknown"
+    total++;
 
-if(!grouped[site]) grouped[site]={}
-if(!grouped[site][dept]) grouped[site][dept]=[]
+    if(p.safe){
+      safeCount++;
+    } else {
+      missing.push(p.name || "");
+    }
+  }
 
-grouped[site][dept].push({
-id:id,
-name:p.name,
-safe:p.safe
-})
+  document.getElementById("safeCount").innerText = safeCount;
+  document.getElementById("totalCount").innerText = total;
+  document.getElementById("missingList").innerText = missing.length ? missing.join(", ") : "None";
 
-total++
+  const percent = total > 0 ? Math.round((safeCount / total) * 100) : 0;
+  document.getElementById("progressBar").style.width = percent + "%";
+  document.getElementById("progressText").innerText = safeCount + " of " + total + " accounted";
 
-if(p.safe){
-safeCount++
-}else{
-missing.push(p.name)
+  const banner = document.getElementById("statusBanner");
+
+  if(total === 0){
+    banner.className = "statusBanner missingBanner";
+    banner.innerText = "No active roster loaded";
+  } else if(safeCount === total){
+    banner.className = "statusBanner safeBanner";
+    banner.innerText = "🟢 ALL ACCOUNTED FOR";
+  } else {
+    banner.className = "statusBanner missingBanner";
+    banner.innerText = "🔴 " + (total - safeCount) + " MISSING";
+  }
+
+  const siteOrder = ["BDC", "CDC", "YARD"];
+  const allSites = Object.keys(grouped).sort((a, b) => {
+    const ai = siteOrder.indexOf(a);
+    const bi = siteOrder.indexOf(b);
+    if(ai === -1 && bi === -1) return a.localeCompare(b);
+    if(ai === -1) return 1;
+    if(bi === -1) return -1;
+    return ai - bi;
+  });
+
+  allSites.forEach(site => {
+    const siteTitle = document.createElement("div");
+    siteTitle.className = "siteTitle";
+    siteTitle.innerText = site;
+    board.appendChild(siteTitle);
+
+    Object.keys(grouped[site]).sort().forEach(dept => {
+      const staffList = grouped[site][dept];
+      const deptKey = site + "||" + dept;
+
+      const deptBlock = document.createElement("div");
+      deptBlock.className = "deptBlock";
+
+      const deptHeader = document.createElement("div");
+      deptHeader.className = "deptHeader";
+
+      const deptBody = document.createElement("div");
+      deptBody.className = "deptBody";
+
+      if(openDepartments[deptKey]){
+        deptBody.style.display = "block";
+        deptHeader.innerText = "▲ " + dept + " (" + staffList.length + ")";
+      } else {
+        deptBody.style.display = "none";
+        deptHeader.innerText = "▼ " + dept + " (" + staffList.length + ")";
+      }
+
+      deptHeader.onclick = () => {
+        openDepartments[deptKey] = !openDepartments[deptKey];
+        renderBoard();
+      };
+
+      staffList.sort((a, b) => a.name.localeCompare(b.name)).forEach(person => {
+        const row = document.createElement("div");
+        row.className = "personRow";
+
+        const name = document.createElement("div");
+        name.className = "personName";
+        name.innerText = person.name;
+
+        const btn = document.createElement("button");
+        btn.className = "safeBtn" + (person.safe ? " safe" : "");
+        btn.innerText = person.safe ? "SAFE" : "MARK SAFE";
+
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          toggleSafe(person.id, person.safe);
+        };
+
+        row.onclick = () => {
+          toggleSafe(person.id, person.safe);
+        };
+
+        row.appendChild(name);
+        row.appendChild(btn);
+        deptBody.appendChild(row);
+      });
+
+      deptBlock.appendChild(deptHeader);
+      deptBlock.appendChild(deptBody);
+      board.appendChild(deptBlock);
+    });
+  });
 }
 
+async function toggleSafe(id, current){
+  const updates = {
+    safe: !current
+  };
+
+  if(!current && currentDrill.startTime){
+    updates.safeTime = Date.now();
+  }
+
+  if(current){
+    updates.safeTime = null;
+  }
+
+  await update(ref(db, "activeShift/" + id), updates);
 }
 
-document.getElementById("safeCount").innerText=safeCount
-document.getElementById("totalCount").innerText=total
-document.getElementById("missingList").innerText=missing.length?missing.join(", "):"None"
+window.startDrill = async function(){
+  if(!confirm("Start new drill and clear all SAFE ticks?")) return;
 
-const banner=document.getElementById("statusBanner")
+  const startTime = Date.now();
 
-if(total>0 && safeCount===total){
-banner.className="statusBanner safeBanner"
-banner.innerText="🟢 ALL ACCOUNTED FOR"
-}else if(total===0){
-banner.className="statusBanner missingBanner"
-banner.innerText="No active roster loaded"
-}else{
-banner.className="statusBanner missingBanner"
-banner.innerText="🔴 "+(total-safeCount)+" MISSING"
+  for(const id in rosterData){
+    await update(ref(db, "activeShift/" + id), {
+      safe: false,
+      safeTime: null
+    });
+  }
+
+  await set(currentDrillRef, {
+    startTime: startTime,
+    endTime: null,
+    shift: shiftInfo.shift || "",
+    team: shiftInfo.team || "",
+    staffTotal: Object.keys(rosterData).length,
+    reportGenerated: false
+  });
+};
+
+async function buildReportObject(endTime){
+  const ids = Object.keys(rosterData);
+
+  const staff = ids.map(id => ({
+    name: rosterData[id].name || "",
+    site: rosterData[id].site || "",
+    department: rosterData[id].department || "",
+    safeTime: rosterData[id].safeTime || null
+  }));
+
+  return {
+    shift: currentDrill.shift || shiftInfo.shift || "",
+    team: currentDrill.team || shiftInfo.team || "",
+    startTime: currentDrill.startTime || null,
+    endTime: endTime,
+    totalTimeMs: currentDrill.startTime ? (endTime - currentDrill.startTime) : 0,
+    totalTimeText: currentDrill.startTime ? formatDuration(endTime - currentDrill.startTime) : "0m 0s",
+    staffTotal: ids.length,
+    staff: staff
+  };
 }
 
-const siteOrder=["BDC","CDC","YARD"]
+async function generateReport(manual){
+  if(!currentDrill.startTime){
+    if(manual){
+      alert("No drill running");
+    }
+    return;
+  }
 
-siteOrder.forEach(site=>{
+  if(reportAlreadyGenerated){
+    if(manual){
+      alert("Report already generated for this drill");
+    }
+    return;
+  }
 
-if(!grouped[site]) return
+  const endTime = Date.now();
+  const report = await buildReportObject(endTime);
 
-const siteTitle=document.createElement("div")
-siteTitle.className="siteTitle"
-siteTitle.innerText=site
-board.appendChild(siteTitle)
+  await push(reportsRef, report);
 
-Object.keys(grouped[site]).sort().forEach(dept=>{
+  await update(currentDrillRef, {
+    endTime: endTime,
+    reportGenerated: true
+  });
 
-const staffList=grouped[site][dept]
+  reportAlreadyGenerated = true;
 
-const deptKey=site+"-"+dept
-
-const deptBlock=document.createElement("div")
-deptBlock.className="deptBlock"
-
-const deptHeader=document.createElement("div")
-deptHeader.className="deptHeader"
-
-const deptBody=document.createElement("div")
-deptBody.className="deptBody"
-
-if(openDepartments[deptKey]){
-deptBody.style.display="block"
-deptHeader.innerText="▲ "+dept+" ("+staffList.length+")"
-}else{
-deptBody.style.display="none"
-deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
+  if(manual){
+    alert("Drill report generated");
+  }
 }
 
-deptHeader.onclick=()=>{
-
-if(openDepartments[deptKey]){
-openDepartments[deptKey]=false
-deptBody.style.display="none"
-deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
-}else{
-openDepartments[deptKey]=true
-deptBody.style.display="block"
-deptHeader.innerText="▲ "+dept+" ("+staffList.length+")"
-}
-
-}
-
-staffList
-.sort((a,b)=>a.name.localeCompare(b.name))
-.forEach(person=>{
-
-const row=document.createElement("div")
-row.className="personRow"
-
-const name=document.createElement("div")
-name.className="personName"
-name.innerText=person.name
-
-const btn=document.createElement("button")
-btn.className="safeBtn"+(person.safe?" safe":"")
-btn.innerText=person.safe?"SAFE":"MARK SAFE"
-
-btn.onclick=(e)=>{
-e.stopPropagation()
-toggleSafe(person.id,person.safe,person.name)
-}
-
-row.onclick=()=>{
-toggleSafe(person.id,person.safe,person.name)
-}
-
-row.appendChild(name)
-row.appendChild(btn)
-
-deptBody.appendChild(row)
-
-})
-
-deptBlock.appendChild(deptHeader)
-deptBlock.appendChild(deptBody)
-board.appendChild(deptBlock)
-
-})
-
-})
-
-}
-
-async function toggleSafe(id,current,name){
-
-const updates={
-safe:!current
-}
-
-if(!current && currentDrill.startTime){
-updates.safeTime=Date.now()
-}
-
-if(current){
-updates.safeTime=null
-}
-
-await update(ref(db,"activeShift/"+id),updates)
-}
-
-window.startDrill=async function(){
-
-if(!confirm("Start new drill and clear all SAFE ticks?")) return
-
-const startTime=Date.now()
-
-for(const id in rosterData){
-await update(ref(db,"activeShift/"+id),{
-safe:false,
-safeTime:null
-})
-}
-
-await set(currentDrillRef,{
-startTime:startTime,
-endTime:null,
-shift:shiftInfo.shift||"",
-team:shiftInfo.team||"",
-staffTotal:Object.keys(rosterData).length
-})
-}
+window.endDrillManual = async function(){
+  if(!confirm("End drill and generate report?")) return;
+  await generateReport(true);
+};
 
 async function checkForDrillCompletion(){
+  const ids = Object.keys(rosterData);
 
-const ids=Object.keys(rosterData)
+  if(ids.length === 0) return;
+  if(!currentDrill.startTime) return;
+  if(reportAlreadyGenerated) return;
 
-if(ids.length===0) return
-if(!currentDrill.startTime) return
-if(currentDrill.endTime) return
+  let allSafe = true;
 
-let allSafe=true
+  for(const id of ids){
+    if(!rosterData[id].safe){
+      allSafe = false;
+      break;
+    }
+  }
 
-for(const id of ids){
-if(!rosterData[id].safe){
-allSafe=false
-break
+  if(allSafe){
+    await generateReport(false);
+  }
 }
-}
-
-if(!allSafe) return
-
-const endTime=Date.now()
-const reportStaff=[]
-
-ids.forEach(id=>{
-reportStaff.push({
-name:rosterData[id].name||"",
-site:rosterData[id].site||"",
-department:rosterData[id].department||"",
-safeTime:rosterData[id].safeTime||null
-})
-})
-
-const reportData={
-shift:currentDrill.shift||shiftInfo.shift||"",
-team:currentDrill.team||shiftInfo.team||"",
-startTime:currentDrill.startTime,
-endTime:endTime,
-totalTimeMs:endTime-currentDrill.startTime,
-totalTimeText:formatDuration(endTime-currentDrill.startTime),
-staffTotal:ids.length,
-staff:reportStaff
-}
-
-await push(reportsRef,reportData)
-
-await update(currentDrillRef,{
-endTime:endTime
-})
-}
-
 </script>
 
 </body>
