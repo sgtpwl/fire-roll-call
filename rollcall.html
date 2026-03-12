@@ -5,146 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 body{
-  font-family: Arial, sans-serif;
-  margin:0;
-  padding:20px;
-  background:#f5f5f5;
+font-family:Arial;
+margin:0;
+padding:20px;
+background:#f5f5f5;
 }
 
 h1{
-  text-align:center;
-  margin-top:0;
+text-align:center;
+margin-top:0;
 }
 
 .statusBanner{
-  text-align:center;
-  font-size:26px;
-  font-weight:bold;
-  padding:14px;
-  border-radius:10px;
-  margin:10px auto 20px auto;
-  max-width:900px;
-  color:white;
+text-align:center;
+font-size:26px;
+font-weight:bold;
+padding:14px;
+border-radius:10px;
+margin:10px auto 20px auto;
+max-width:900px;
+color:white;
 }
 
 .safeBanner{
-  background:#4CAF50;
+background:#4CAF50;
 }
 
 .missingBanner{
-  background:#d32f2f;
+background:#d32f2f;
 }
 
 .headerBox{
-  max-width:900px;
-  margin:0 auto 20px auto;
-  padding:12px;
-  background:white;
-  border:1px solid #ccc;
-  border-radius:8px;
-  text-align:center;
+max-width:900px;
+margin:0 auto 20px auto;
+padding:12px;
+background:white;
+border:1px solid #ccc;
+border-radius:8px;
+text-align:center;
 }
 
 .counts{
-  font-size:20px;
-  margin-top:6px;
+font-size:20px;
+margin-top:6px;
 }
 
 .resetBtn{
-  margin-top:10px;
-  padding:12px 20px;
-  font-size:16px;
-  border:none;
-  border-radius:6px;
-  background:#ff9800;
-  cursor:pointer;
+margin-top:10px;
+padding:12px 20px;
+font-size:16px;
+border:none;
+border-radius:6px;
+background:#ff9800;
+cursor:pointer;
 }
 
 .section{
-  max-width:900px;
-  margin:20px auto;
+max-width:900px;
+margin:20px auto;
 }
 
 .siteTitle{
-  font-size:24px;
-  font-weight:bold;
-  margin:18px 0 8px 0;
+font-size:24px;
+font-weight:bold;
+margin:18px 0 8px 0;
 }
 
 .deptBlock{
-  border:1px solid #ccc;
-  border-radius:8px;
-  margin:10px 0;
-  background:white;
-  overflow:hidden;
+border:1px solid #ccc;
+border-radius:8px;
+margin:10px 0;
+background:white;
+overflow:hidden;
 }
 
 .deptHeader{
-  background:#ececec;
-  padding:12px;
-  font-weight:bold;
+background:#ececec;
+padding:12px;
+font-weight:bold;
+cursor:pointer;
 }
 
 .deptBody{
-  padding:10px;
+padding:10px;
+display:none;
 }
 
 .personRow{
-  border:1px solid #ddd;
-  border-radius:6px;
-  margin:8px 0;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-  gap:10px;
-  flex-wrap:wrap;
+border:1px solid #ddd;
+border-radius:6px;
+margin:8px 0;
+padding:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;
 }
 
 .personName{
-  font-weight:bold;
-  font-size:16px;
+font-weight:bold;
+font-size:16px;
 }
 
 .safeBtn{
-  padding:8px 14px;
-  border:none;
-  border-radius:6px;
-  background:#e0e0e0;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#e0e0e0;
 }
 
 .safeBtn.safe{
-  background:#4CAF50;
-  color:white;
+background:#4CAF50;
+color:white;
 }
 
 .missingBox{
-  max-width:900px;
-  margin:20px auto;
-  padding:12px;
-  background:white;
-  border:1px solid #ccc;
-  border-radius:8px;
+max-width:900px;
+margin:20px auto;
+padding:12px;
+background:white;
+border:1px solid #ccc;
+border-radius:8px;
 }
 
 .missingTitle{
-  font-weight:bold;
-  margin-bottom:6px;
+font-weight:bold;
+margin-bottom:6px;
 }
 
 @media (max-width:700px){
-  .personRow{
-    flex-direction:column;
-    align-items:flex-start;
-  }
 
-  .safeBtn{
-    margin-top:8px;
-    width:100%;
-  }
+.personRow{
+flex-direction:column;
+align-items:flex-start;
 }
+
+.safeBtn{
+margin-top:8px;
+width:100%;
+}
+
+}
+
 </style>
 </head>
 
@@ -153,184 +157,229 @@ h1{
 <h1>🔥 Fire Roll Call</h1>
 
 <div id="statusBanner" class="statusBanner missingBanner">
-  Waiting for drill
+Waiting for drill
 </div>
 
 <div class="headerBox">
-  <div id="shiftDisplay">Shift: —</div>
 
-  <div class="counts">
-    Accounted <span id="safeCount">0</span> /
-    <span id="totalCount">0</span>
-  </div>
+<div id="shiftDisplay">Shift: —</div>
 
-  <button class="resetBtn" onclick="resetDrill()">START DRILL</button>
+<div class="counts">
+Accounted <span id="safeCount">0</span> /
+<span id="totalCount">0</span>
+</div>
+
+<button class="resetBtn" onclick="resetDrill()">START DRILL</button>
+
 </div>
 
 <div id="board" class="section"></div>
 
 <div class="missingBox">
-  <div class="missingTitle">Missing</div>
-  <div id="missingList">None</div>
+<div class="missingTitle">Missing</div>
+<div id="missingList">None</div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-  authDomain: "shunt-queue.firebaseapp.com",
-  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "shunt-queue",
-  storageBucket: "shunt-queue.appspot.com",
-  messagingSenderId: "773776993625",
-  appId: "1:773776993625:web:2082ee7a38be041bee7048"
-};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const firebaseConfig={
+apiKey:"AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain:"shunt-queue.firebaseapp.com",
+databaseURL:"https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId:"shunt-queue",
+storageBucket:"shunt-queue.appspot.com",
+messagingSenderId:"773776993625",
+appId:"1:773776993625:web:2082ee7a38be041bee7048"
+}
 
-const rosterRef = ref(db, "activeShift");
-const shiftInfoRef = ref(db, "shiftInfo");
+const app=initializeApp(firebaseConfig)
+const db=getDatabase(app)
 
-let rosterData = {};
+const rosterRef=ref(db,"activeShift")
+const shiftInfoRef=ref(db,"shiftInfo")
 
-onValue(shiftInfoRef, (snap) => {
-  const data = snap.val() || {};
+let rosterData={}
 
-  if(data.shift){
-    document.getElementById("shiftDisplay").innerText =
-      "Shift: " + data.shift + " Shift " + data.team;
-  } else {
-    document.getElementById("shiftDisplay").innerText = "Shift: —";
-  }
-});
+onValue(shiftInfoRef,(snap)=>{
 
-onValue(rosterRef, (snapshot) => {
-  rosterData = snapshot.val() || {};
-  renderBoard();
-});
+const data=snap.val()||{}
+
+if(data.shift){
+document.getElementById("shiftDisplay").innerText=
+"Shift: "+data.shift+" Shift "+data.team
+}
+
+})
+
+onValue(rosterRef,(snapshot)=>{
+
+rosterData=snapshot.val()||{}
+
+renderBoard()
+
+})
 
 function renderBoard(){
-  const board = document.getElementById("board");
-  board.innerHTML = "";
 
-  const missing = [];
-  let safeCount = 0;
-  let total = 0;
+const board=document.getElementById("board")
+board.innerHTML=""
 
-  const grouped = {};
+const missing=[]
 
-  for(const id in rosterData){
-    const p = rosterData[id];
+let safeCount=0
+let total=0
 
-    const site = p.site || "Unknown";
-    const dept = p.department || "Unknown";
+const grouped={}
 
-    if(!grouped[site]) grouped[site] = {};
-    if(!grouped[site][dept]) grouped[site][dept] = [];
+for(const id in rosterData){
 
-    grouped[site][dept].push({
-      id: id,
-      name: p.name,
-      safe: p.safe
-    });
+const p=rosterData[id]
 
-    total++;
+const site=p.site||"Unknown"
+const dept=p.department||"Unknown"
 
-    if(p.safe){
-      safeCount++;
-    } else {
-      missing.push(p.name);
-    }
-  }
+if(!grouped[site]) grouped[site]={}
+if(!grouped[site][dept]) grouped[site][dept]=[]
 
-  document.getElementById("safeCount").innerText = safeCount;
-  document.getElementById("totalCount").innerText = total;
-  document.getElementById("missingList").innerText = missing.length ? missing.join(", ") : "None";
+grouped[site][dept].push({
+id:id,
+name:p.name,
+safe:p.safe
+})
 
-  const banner = document.getElementById("statusBanner");
+total++
 
-  if(total > 0 && safeCount === total){
-    banner.className = "statusBanner safeBanner";
-    banner.innerText = "🟢 ALL ACCOUNTED FOR";
-  } else if(total === 0){
-    banner.className = "statusBanner missingBanner";
-    banner.innerText = "No active roster loaded";
-  } else {
-    banner.className = "statusBanner missingBanner";
-    banner.innerText = "🔴 " + (total - safeCount) + " MISSING";
-  }
-
-  Object.keys(grouped).sort().forEach(site => {
-    const siteTitle = document.createElement("div");
-    siteTitle.className = "siteTitle";
-    siteTitle.innerText = site;
-    board.appendChild(siteTitle);
-
-    Object.keys(grouped[site]).sort().forEach(dept => {
-      const deptBlock = document.createElement("div");
-      deptBlock.className = "deptBlock";
-
-      const deptHeader = document.createElement("div");
-      deptHeader.className = "deptHeader";
-      deptHeader.innerText = dept;
-
-      const deptBody = document.createElement("div");
-      deptBody.className = "deptBody";
-
-      grouped[site][dept]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .forEach(person => {
-          const row = document.createElement("div");
-          row.className = "personRow";
-
-          const name = document.createElement("div");
-          name.className = "personName";
-          name.innerText = person.name;
-
-          const btn = document.createElement("button");
-          btn.className = "safeBtn" + (person.safe ? " safe" : "");
-          btn.innerText = person.safe ? "SAFE" : "MARK SAFE";
-
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            toggleSafe(person.id, person.safe);
-          };
-
-          row.onclick = () => {
-            toggleSafe(person.id, person.safe);
-          };
-
-          row.appendChild(name);
-          row.appendChild(btn);
-
-          deptBody.appendChild(row);
-        });
-
-      deptBlock.appendChild(deptHeader);
-      deptBlock.appendChild(deptBody);
-      board.appendChild(deptBlock);
-    });
-  });
+if(p.safe){
+safeCount++
+}else{
+missing.push(p.name)
 }
 
-function toggleSafe(id, current){
-  update(ref(db, "activeShift/" + id), {
-    safe: !current
-  });
 }
 
-window.resetDrill = function(){
-  if(!confirm("Start new drill and clear all SAFE ticks?")) return;
+document.getElementById("safeCount").innerText=safeCount
+document.getElementById("totalCount").innerText=total
 
-  for(const id in rosterData){
-    update(ref(db, "activeShift/" + id), {
-      safe: false
-    });
-  }
-};
+const missingList=document.getElementById("missingList")
+missingList.innerText=missing.length?missing.join(", "):"None"
+
+const banner=document.getElementById("statusBanner")
+
+if(total>0 && safeCount===total){
+
+banner.className="statusBanner safeBanner"
+banner.innerText="🟢 ALL ACCOUNTED FOR"
+
+}else{
+
+banner.className="statusBanner missingBanner"
+banner.innerText="🔴 "+(total-safeCount)+" MISSING"
+
+}
+
+const siteOrder=["BDC","CDC","YARD"]
+
+siteOrder.forEach(site=>{
+
+if(!grouped[site]) return
+
+const siteTitle=document.createElement("div")
+siteTitle.className="siteTitle"
+siteTitle.innerText=site
+board.appendChild(siteTitle)
+
+Object.keys(grouped[site]).sort().forEach(dept=>{
+
+const staffList=grouped[site][dept]
+
+const deptBlock=document.createElement("div")
+deptBlock.className="deptBlock"
+
+const deptHeader=document.createElement("div")
+deptHeader.className="deptHeader"
+deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
+
+const deptBody=document.createElement("div")
+deptBody.className="deptBody"
+
+deptHeader.onclick=()=>{
+
+if(deptBody.style.display==="none"){
+deptBody.style.display="block"
+deptHeader.innerText="▲ "+dept+" ("+staffList.length+")"
+}else{
+deptBody.style.display="none"
+deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
+}
+
+}
+
+staffList
+.sort((a,b)=>a.name.localeCompare(b.name))
+.forEach(person=>{
+
+const row=document.createElement("div")
+row.className="personRow"
+
+const name=document.createElement("div")
+name.className="personName"
+name.innerText=person.name
+
+const btn=document.createElement("button")
+btn.className="safeBtn"+(person.safe?" safe":"")
+btn.innerText=person.safe?"SAFE":"MARK SAFE"
+
+btn.onclick=(e)=>{
+e.stopPropagation()
+toggleSafe(person.id,person.safe)
+}
+
+row.onclick=()=>{
+toggleSafe(person.id,person.safe)
+}
+
+row.appendChild(name)
+row.appendChild(btn)
+
+deptBody.appendChild(row)
+
+})
+
+deptBlock.appendChild(deptHeader)
+deptBlock.appendChild(deptBody)
+board.appendChild(deptBlock)
+
+})
+
+})
+
+}
+
+function toggleSafe(id,current){
+
+update(ref(db,"activeShift/"+id),{
+safe:!current
+})
+
+}
+
+window.resetDrill=function(){
+
+if(!confirm("Start new drill and clear all SAFE ticks?")) return
+
+for(const id in rosterData){
+
+update(ref(db,"activeShift/"+id),{
+safe:false
+})
+
+}
+
+}
+
 </script>
 
 </body>
