@@ -1,618 +1,271 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Shift Roster</title>
+
+<title>Shift Setup</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 body{
-  font-family: Arial, sans-serif;
-  padding:20px;
-  text-align:center;
-  margin:0;
+font-family:Arial;
+margin:0;
+padding:20px;
+background:#f5f5f5;
 }
 
-h1,h2,h3{
-  margin:12px 0;
-}
-
-select,input{
-  width:260px;
-  height:42px;
-  font-size:16px;
-  margin:8px;
-  padding:0 10px;
-  box-sizing:border-box;
-}
-
-button{
-  min-height:42px;
-  font-size:16px;
-  margin:6px;
-  padding:0 14px;
+h1{
+text-align:center;
+margin-top:0;
 }
 
 .section{
-  max-width:900px;
-  margin:18px auto;
-  border:1px solid #ccc;
-  border-radius:8px;
-  padding:12px;
-  text-align:left;
-}
-
-.siteTitle{
-  font-size:22px;
-  font-weight:bold;
-  margin:14px 0 8px 0;
-}
-
-.deptBlock{
-  border:1px solid #ddd;
-  border-radius:8px;
-  margin:10px 0;
-  overflow:hidden;
-}
-
-.deptHeader{
-  background:#f2f2f2;
-  padding:12px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.deptBody{
-  padding:8px 12px 12px 12px;
+max-width:900px;
+margin:20px auto;
+background:white;
+border:1px solid #ccc;
+border-radius:10px;
+padding:15px;
 }
 
 .staffRow{
-  border:1px solid #e0e0e0;
-  border-radius:6px;
-  margin:8px 0;
-  padding:10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
+border:1px solid #ddd;
+border-radius:6px;
+margin:6px 0;
+padding:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-.staffLeft{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex:1;
-  min-width:220px;
+.removeBtn{
+background:#d32f2f;
+color:white;
+border:none;
+border-radius:6px;
+padding:6px 10px;
+cursor:pointer;
 }
 
-.statusText{
-  font-weight:bold;
+.addBtn{
+background:#4CAF50;
+color:white;
+border:none;
+border-radius:6px;
+padding:10px 16px;
+cursor:pointer;
+margin-top:10px;
 }
 
-.smallText{
-  font-size:14px;
-  color:#555;
+.searchBox{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:16px;
 }
 
-.searchRow{
-  border:1px solid #ddd;
-  border-radius:6px;
-  margin:8px auto;
-  padding:10px;
-  max-width:700px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  text-align:left;
+.staffCheckbox{
+margin-right:8px;
 }
 
-.infoBox{
-  max-width:900px;
-  margin:12px auto;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  background:#fafafa;
-}
-
-@media (max-width: 700px){
-  .staffRow, .searchRow{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .staffLeft{
-    width:100%;
-  }
-
-  button{
-    width:100%;
-  }
-}
 </style>
+
 </head>
 
 <body>
 
-<h1>Shift Roster</h1>
+<h1>Shift Setup</h1>
 
-<div class="infoBox" id="activeShiftInfo">No shift activated yet.</div>
+<div class="section">
 
-<div class="section" style="text-align:center;">
-  <select id="shift">
-    <option value="Days">Days</option>
-    <option value="Nights">Nights</option>
-  </select>
+<h2>Active Staff (Currently On Site)</h2>
 
-  <select id="team">
-    <option value="A">Shift A</option>
-    <option value="B">Shift B</option>
-  </select>
+<div id="activeStaff"></div>
 
-  <br>
-
-  <button onclick="loadShiftStaff()">Load Shift Staff</button>
-  <button onclick="saveShiftRoster()">Save Shift Roster</button>
-</div>
-
-<div class="section" style="text-align:center;">
-  <h2>Search Staff</h2>
-  <input id="searchBox" placeholder="Search name" onkeyup="searchStaff()">
-  <div id="searchResults"></div>
-</div>
-
-<div class="section" style="text-align:center;">
-  <h2>Add Temporary Worker</h2>
-
-  <input id="tempName" placeholder="Name">
-
-  <br>
-
-  <select id="tempDepartment" onchange="updateTempSite()">
-    <option value="">Select Department</option>
-
-    <option value="BDC Picking">BDC Picking</option>
-    <option value="BDC MHE">BDC MHE</option>
-    <option value="BDC Despatch">BDC Despatch</option>
-    <option value="BDC Inbound">BDC Inbound</option>
-    <option value="BDC Stock">BDC Stock Team</option>
-
-    <option value="CDC Picking">CDC Picking</option>
-    <option value="CDC MHE">CDC MHE</option>
-    <option value="CDC Despatch">CDC Despatch</option>
-    <option value="CDC Inbound">CDC Inbound</option>
-    <option value="CDC Stock">CDC Stock Team</option>
-
-    <option value="Supervisor">Supervisor</option>
-    <option value="Manager">Manager</option>
-
-    <option value="Yard Shunters">Yard Shunters</option>
-    <option value="Yard Gatehouse">Yard Gatehouse</option>
-
-    <option value="Compliance">Compliance</option>
-  </select>
-
-  <br>
-
-  <select id="tempSite">
-    <option value="">Select Site</option>
-    <option value="BDC">BDC</option>
-    <option value="CDC">CDC</option>
-    <option value="YARD">Yard</option>
-  </select>
-
-  <br>
-
-  <button onclick="addTemp()">Add Temporary Worker</button>
 </div>
 
 <div class="section">
-  <h2 style="text-align:center;">Loaded Shift Staff</h2>
-  <div id="loadedSummary" class="smallText" style="text-align:center;">Nothing loaded yet.</div>
-  <div id="loadedStaff"></div>
-</div>
 
-<div class="section">
-  <h2 style="text-align:center;">Staff Currently On Site</h2>
-  <div id="rosterSummary" class="smallText" style="text-align:center;">No one currently added.</div>
-  <div id="roster"></div>
+<h2>Add Staff To Shift</h2>
+
+<input
+id="searchBox"
+class="searchBox"
+placeholder="Search staff..."
+onkeyup="filterStaff()"
+/>
+
+<div id="staffList"></div>
+
+<button class="addBtn" onclick="addSelected()">
+Add Selected Staff
+</button>
+
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-  authDomain: "shunt-queue.firebaseapp.com",
-  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "shunt-queue",
-  storageBucket: "shunt-queue.appspot.com",
-  messagingSenderId: "773776993625",
-  appId: "1:773776993625:web:2082ee7a38be041bee7048"
-};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const staffRef = ref(db, "fireStaff");
-const rosterRef = ref(db, "activeShift");
-const shiftInfoRef = ref(db, "shiftInfo");
-
-let staffData = {};
-let rosterData = {};
-let currentShiftInfo = {};
-let loadedCandidates = [];
-
-onValue(staffRef, (snapshot) => {
-  staffData = snapshot.val() || {};
-});
-
-onValue(rosterRef, (snapshot) => {
-  rosterData = snapshot.val() || {};
-  renderRoster();
-  renderSearchResults();
-});
-
-onValue(shiftInfoRef, (snapshot) => {
-  currentShiftInfo = snapshot.val() || {};
-  renderShiftInfo();
-});
-
-function renderShiftInfo(){
-  const box = document.getElementById("activeShiftInfo");
-
-  if(currentShiftInfo.shift && currentShiftInfo.team){
-    box.innerHTML = "<strong>Current active shift:</strong> " + currentShiftInfo.shift + " Shift " + currentShiftInfo.team;
-  }else{
-    box.innerHTML = "No shift activated yet.";
-  }
+const firebaseConfig={
+apiKey:"AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain:"shunt-queue.firebaseapp.com",
+databaseURL:"https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId:"shunt-queue",
+storageBucket:"shunt-queue.appspot.com",
+messagingSenderId:"773776993625",
+appId:"1:773776993625:web:2082ee7a38be041bee7048"
 }
 
-function getRosterNames(){
-  const names = [];
-  for(const id in rosterData){
-    if(rosterData[id] && rosterData[id].name){
-      names.push(rosterData[id].name.trim().toLowerCase());
-    }
-  }
-  return names;
+const app=initializeApp(firebaseConfig)
+const db=getDatabase(app)
+
+const staffRef=ref(db,"staff")
+const activeRef=ref(db,"activeShift")
+
+let staffData={}
+let activeData={}
+
+onValue(staffRef,(snap)=>{
+
+staffData=snap.val()||{}
+renderStaffList()
+
+})
+
+onValue(activeRef,(snap)=>{
+
+activeData=snap.val()||{}
+renderActiveStaff()
+
+})
+
+function renderActiveStaff(){
+
+const container=document.getElementById("activeStaff")
+
+container.innerHTML=""
+
+for(const id in activeData){
+
+const person=activeData[id]
+
+const row=document.createElement("div")
+row.className="staffRow"
+
+row.innerHTML=`
+<div>
+${person.name} — ${person.site} / ${person.department}
+</div>
+
+<button class="removeBtn" onclick="removePerson('${id}')">
+Remove
+</button>
+`
+
+container.appendChild(row)
+
 }
 
-function isAlreadyOnRoster(name){
-  return getRosterNames().includes(name.trim().toLowerCase());
+if(Object.keys(activeData).length===0){
+
+container.innerHTML="<i>No staff currently on shift</i>"
+
 }
 
-function groupedBySiteAndDepartment(items){
-  const grouped = {};
-
-  items.forEach(item => {
-    const site = item.site || "Unknown";
-    const department = item.department || "Unknown";
-
-    if(!grouped[site]) grouped[site] = {};
-    if(!grouped[site][department]) grouped[site][department] = [];
-    grouped[site][department].push(item);
-  });
-
-  return grouped;
 }
 
-function siteOrderValue(site){
-  if(site === "BDC") return 1;
-  if(site === "CDC") return 2;
-  if(site === "YARD") return 3;
-  return 99;
+window.removePerson=async function(id){
+
+await remove(ref(db,"activeShift/"+id))
+
 }
 
-function sortedSites(grouped){
-  return Object.keys(grouped).sort((a,b) => siteOrderValue(a) - siteOrderValue(b) || a.localeCompare(b));
+function renderStaffList(){
+
+const container=document.getElementById("staffList")
+
+container.innerHTML=""
+
+for(const id in staffData){
+
+const person=staffData[id]
+
+const row=document.createElement("div")
+row.className="staffRow"
+row.dataset.name=person.name.toLowerCase()
+
+row.innerHTML=`
+<label>
+
+<input
+type="checkbox"
+class="staffCheckbox"
+data-id="${id}"
+data-name="${person.name}"
+data-site="${person.site}"
+data-department="${person.department}"
+>
+
+${person.name} — ${person.site} / ${person.department}
+
+</label>
+`
+
+container.appendChild(row)
+
 }
 
-function createGroupedCheckboxList(items, containerId){
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-
-  if(items.length === 0){
-    container.innerHTML = "<div class='smallText' style='text-align:center;'>No staff found.</div>";
-    return;
-  }
-
-  const grouped = groupedBySiteAndDepartment(items);
-
-  sortedSites(grouped).forEach(site => {
-    const siteTitle = document.createElement("div");
-    siteTitle.className = "siteTitle";
-    siteTitle.innerText = site;
-    container.appendChild(siteTitle);
-
-    Object.keys(grouped[site]).sort().forEach(department => {
-      const deptBlock = document.createElement("div");
-      deptBlock.className = "deptBlock";
-
-      const deptHeader = document.createElement("div");
-      deptHeader.className = "deptHeader";
-      deptHeader.innerText = department + " (" + grouped[site][department].length + ")";
-      deptBlock.appendChild(deptHeader);
-
-      const deptBody = document.createElement("div");
-      deptBody.className = "deptBody";
-
-      grouped[site][department]
-        .sort((a,b) => a.name.localeCompare(b.name))
-        .forEach(person => {
-          const row = document.createElement("div");
-          row.className = "staffRow";
-
-          const left = document.createElement("div");
-          left.className = "staffLeft";
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.checked = false;
-          checkbox.dataset.name = person.name;
-          checkbox.dataset.department = person.department;
-          checkbox.dataset.site = person.site;
-          checkbox.dataset.role = person.role || "";
-
-          const text = document.createElement("div");
-          text.innerHTML = "<strong>" + escapeHtml(person.name) + "</strong>";
-
-          left.appendChild(checkbox);
-          left.appendChild(text);
-
-          row.appendChild(left);
-          deptBody.appendChild(row);
-        });
-
-      deptBlock.appendChild(deptBody);
-      container.appendChild(deptBlock);
-    });
-  });
 }
 
-function renderRoster(){
-  const list = document.getElementById("roster");
-  list.innerHTML = "";
+window.filterStaff=function(){
 
-  const rosterArray = [];
+const search=document.getElementById("searchBox").value.toLowerCase()
 
-  for(const id in rosterData){
-    rosterArray.push({
-      id: id,
-      name: rosterData[id].name || "",
-      department: rosterData[id].department || "",
-      site: rosterData[id].site || "",
-      safe: rosterData[id].safe || false
-    });
-  }
+const rows=document.querySelectorAll("#staffList .staffRow")
 
-  document.getElementById("rosterSummary").innerText =
-    rosterArray.length === 0 ? "No one currently added." : rosterArray.length + " currently on site.";
+rows.forEach(r=>{
 
-  if(rosterArray.length === 0){
-    return;
-  }
-
-  const grouped = groupedBySiteAndDepartment(rosterArray);
-
-  sortedSites(grouped).forEach(site => {
-    const siteTitle = document.createElement("div");
-    siteTitle.className = "siteTitle";
-    siteTitle.innerText = site;
-    list.appendChild(siteTitle);
-
-    Object.keys(grouped[site]).sort().forEach(department => {
-      const deptBlock = document.createElement("div");
-      deptBlock.className = "deptBlock";
-
-      const deptHeader = document.createElement("div");
-      deptHeader.className = "deptHeader";
-      deptHeader.innerText = department + " (" + grouped[site][department].length + ")";
-      deptBlock.appendChild(deptHeader);
-
-      const deptBody = document.createElement("div");
-      deptBody.className = "deptBody";
-
-      grouped[site][department]
-        .sort((a,b) => a.name.localeCompare(b.name))
-        .forEach(person => {
-          const row = document.createElement("div");
-          row.className = "staffRow";
-
-          const left = document.createElement("div");
-          left.className = "staffLeft";
-          left.innerHTML = "<strong>" + escapeHtml(person.name) + "</strong>";
-
-          const removeBtn = document.createElement("button");
-          removeBtn.innerText = "Remove";
-          removeBtn.onclick = function(){
-            remove(ref(db, "activeShift/" + person.id));
-          };
-
-          row.appendChild(left);
-          row.appendChild(removeBtn);
-          deptBody.appendChild(row);
-        });
-
-      deptBlock.appendChild(deptBody);
-      list.appendChild(deptBlock);
-    });
-  });
+if(r.dataset.name.includes(search)){
+r.style.display="flex"
+}else{
+r.style.display="none"
 }
 
-function escapeHtml(text){
-  return String(text)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+})
+
 }
 
-window.loadShiftStaff = function(){
-  const shift = document.getElementById("shift").value;
-  const team = document.getElementById("team").value;
+window.addSelected=async function(){
 
-  const loaded = [];
+const boxes=document.querySelectorAll(".staffCheckbox:checked")
 
-  for(const id in staffData){
-    const person = staffData[id];
-    if(person.shift === shift && person.team === team){
-      loaded.push({
-        id: id,
-        name: person.name || "",
-        department: person.department || "",
-        site: person.site || "",
-        role: person.role || ""
-      });
-    }
-  }
+for(const box of boxes){
 
-  loadedCandidates = loaded;
+const id=box.dataset.id
 
-  document.getElementById("loadedSummary").innerText =
-    loaded.length === 0 ? "No staff found for " + shift + " Shift " + team + "." : "Loaded " + loaded.length + " staff for " + shift + " Shift " + team + ".";
+await update(ref(db,"activeShift/"+id),{
 
-  createGroupedCheckboxList(loaded, "loadedStaff");
-};
+name:box.dataset.name,
+site:box.dataset.site,
+department:box.dataset.department,
+safe:false,
+safeTime:null
 
-window.saveShiftRoster = function(){
-  const shift = document.getElementById("shift").value;
-  const team = document.getElementById("team").value;
+})
 
-  const checkboxes = document.querySelectorAll("#loadedStaff input[type='checkbox']");
-  const rosterNames = getRosterNames();
+box.checked=false
 
-  let addedCount = 0;
-
-  checkboxes.forEach(box => {
-    if(box.checked){
-      const lowerName = box.dataset.name.trim().toLowerCase();
-
-      if(!rosterNames.includes(lowerName)){
-        push(rosterRef, {
-          name: box.dataset.name,
-          department: box.dataset.department,
-          site: box.dataset.site,
-          safe: false
-        });
-        rosterNames.push(lowerName);
-        addedCount++;
-      }
-    }
-  });
-
-  set(shiftInfoRef, {
-    shift: shift,
-    team: team
-  });
-
-  alert("Shift roster saved. " + addedCount + " new staff added.");
-};
-
-window.searchStaff = function(){
-  renderSearchResults();
-};
-
-function renderSearchResults(){
-  const search = document.getElementById("searchBox").value.trim().toLowerCase();
-  const results = document.getElementById("searchResults");
-  results.innerHTML = "";
-
-  if(search.length < 2){
-    return;
-  }
-
-  const matches = [];
-
-  for(const id in staffData){
-    const person = staffData[id];
-    if((person.name || "").toLowerCase().includes(search)){
-      matches.push(person);
-    }
-  }
-
-  matches.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
-
-  matches.forEach(person => {
-    const row = document.createElement("div");
-    row.className = "searchRow";
-
-    const text = document.createElement("div");
-    text.innerHTML = "<strong>" + escapeHtml(person.name || "") + "</strong><br><span class='smallText'>" + escapeHtml(person.department || "") + "</span>";
-
-    const right = document.createElement("div");
-
-    if(isAlreadyOnRoster(person.name || "")){
-      right.innerHTML = "<span class='statusText'>✔ Already on shift</span>";
-    }else{
-      const btn = document.createElement("button");
-      btn.innerText = "Add";
-      btn.onclick = function(){
-        push(rosterRef, {
-          name: person.name || "",
-          department: person.department || "",
-          site: person.site || "",
-          safe: false
-        });
-      };
-      right.appendChild(btn);
-    }
-
-    row.appendChild(text);
-    row.appendChild(right);
-    results.appendChild(row);
-  });
-
-  if(matches.length === 0){
-    results.innerHTML = "<div class='smallText'>No matches found.</div>";
-  }
 }
 
-window.updateTempSite = function(){
-  const dept = document.getElementById("tempDepartment").value;
-  const siteSelect = document.getElementById("tempSite");
+alert("Staff added to shift")
 
-  if(dept.startsWith("BDC")){
-    siteSelect.value = "BDC";
-  }else if(dept.startsWith("CDC")){
-    siteSelect.value = "CDC";
-  }else if(dept.startsWith("Yard")){
-    siteSelect.value = "YARD";
-  }else{
-    siteSelect.value = "";
-  }
-};
+}
 
-window.addTemp = function(){
-  const name = document.getElementById("tempName").value.trim();
-  const department = document.getElementById("tempDepartment").value;
-  const site = document.getElementById("tempSite").value;
-
-  if(name === "" || department === "" || site === ""){
-    alert("Please complete name, department and site.");
-    return;
-  }
-
-  if(isAlreadyOnRoster(name)){
-    alert("That person is already on shift.");
-    return;
-  }
-
-  push(rosterRef, {
-    name: name,
-    department: department,
-    site: site,
-    safe: false
-  });
-
-  document.getElementById("tempName").value = "";
-  document.getElementById("tempDepartment").value = "";
-  document.getElementById("tempSite").value = "";
-};
 </script>
 
 </body>
