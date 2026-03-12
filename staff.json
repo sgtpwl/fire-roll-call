@@ -1,0 +1,12 @@
+[
+ { "name": "John Smith", "area": "BDC_PICKING" },
+ { "name": "Dave Taylor", "area": "BDC_PICKING" },
+ { "name": "Mike Clark", "area": "BDC_MHE" },
+ { "name": "Emma Reed", "area": "BDC_DESPATCH" },
+ { "name": "Lisa Brown", "area": "BDC_STOCK" },
+
+ { "name": "Chris Cole", "area": "CDC_PICKING" },
+ { "name": "Jake Long", "area": "CDC_MHE" },
+ { "name": "Tom White", "area": "CDC_DESPATCH" },
+ { "name": "Sarah Jones", "area": "CDC_STOCK" }
+]
