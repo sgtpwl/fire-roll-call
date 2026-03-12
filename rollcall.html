@@ -50,31 +50,49 @@ color:white;
 
 <div id="list"></div>
 
-<script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+
+const firebaseConfig = {
+
+YOUR_FIREBASE_CONFIG_HERE
+
+}
+
+const app = initializeApp(firebaseConfig)
+const db = getDatabase(app)
 
 const params = new URLSearchParams(window.location.search)
 const area = params.get("area")
 
 document.getElementById("title").innerText = area.replace("_"," ")
 
-const staff = [
-"John Smith",
-"Dave Taylor",
-"Emma Reed",
-"Mike Clark",
-"Chris Cole",
-"Jake Long"
-]
-
-let accounted = 0
-
 const list = document.getElementById("list")
 
-staff.forEach(name => {
+const staffRef = ref(db,"fireStaff")
+
+let accounted = 0
+let total = 0
+
+onValue(staffRef,(snapshot)=>{
+
+const data = snapshot.val()
+
+list.innerHTML=""
+accounted = 0
+total = 0
+
+for(const id in data){
+
+if(data[id].area === area){
+
+total++
 
 const div = document.createElement("div")
 div.className="person"
-div.innerText=name
+div.innerText=data[id].name
 
 div.onclick=function(){
 
@@ -92,15 +110,19 @@ update()
 
 list.appendChild(div)
 
-})
-
-function update(){
-
-document.getElementById("counter").innerText = accounted + " / " + staff.length + " accounted"
+}
 
 }
 
 update()
+
+})
+
+function update(){
+
+document.getElementById("counter").innerText = accounted + " / " + total + " accounted"
+
+}
 
 </script>
 
