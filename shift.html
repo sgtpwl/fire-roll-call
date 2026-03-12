@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shift Setup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+font-family: Arial;
+text-align:center;
+padding:20px;
+}
+
+select{
+width:200px;
+height:40px;
+font-size:16px;
+margin:10px;
+}
+
+button{
+height:40px;
+font-size:16px;
+margin:10px;
+}
+
+.staffRow{
+border:1px solid #ccc;
+margin:6px;
+padding:8px;
+font-size:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Shift Setup</h1>
+
+<select id="shift">
+<option value="Days">Days</option>
+<option value="Nights">Nights</option>
+</select>
+
+<select id="team">
+<option value="A">Shift A</option>
+<option value="B">Shift B</option>
+</select>
+
+<br>
+
+<button onclick="loadStaff()">Load Staff</button>
+
+<h2>Staff On Shift</h2>
+
+<div id="staffList"></div>
+
+<br>
+
+<button onclick="startShift()">START SHIFT</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain: "shunt-queue.firebaseapp.com",
+databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "shunt-queue",
+storageBucket: "shunt-queue.appspot.com",
+messagingSenderId: "773776993625",
+appId: "1:773776993625:web:2082ee7a38be041bee7048"
+
+}
+
+const app = initializeApp(firebaseConfig)
+const db = getDatabase(app)
+
+const staffRef = ref(db,"fireStaff")
+
+window.loadStaff = function(){
+
+const shift = document.getElementById("shift").value
+const team = document.getElementById("team").value
+
+onValue(staffRef,(snapshot)=>{
+
+const data = snapshot.val()
+
+const list = document.getElementById("staffList")
+list.innerHTML=""
+
+for(const id in data){
+
+if(data[id].shift===shift && data[id].team===team){
+
+const row=document.createElement("div")
+row.className="staffRow"
+
+const checkbox=document.createElement("input")
+checkbox.type="checkbox"
+checkbox.checked=true
+
+checkbox.dataset.name=data[id].name
+checkbox.dataset.department=data[id].department
+checkbox.dataset.site=data[id].site
+
+row.appendChild(checkbox)
+
+row.innerHTML+=
+" "+data[id].name+
+" — "+data[id].department+
+" ("+data[id].site+")"
+
+list.appendChild(row)
+
+}
+
+}
+
+})
+
+}
+
+window.startShift=function(){
+
+const checkboxes=document.querySelectorAll("#staffList input")
+
+let active=[]
+
+checkboxes.forEach(box=>{
+
+if(box.checked){
+
+active.push({
+name:box.dataset.name,
+department:box.dataset.department,
+site:box.dataset.site,
+safe:false
+})
+
+}
+
+})
+
+set(ref(db,"activeShift"),active)
+
+alert("Shift started successfully")
+
+}
+
+</script>
+
+</body>
+</html>
