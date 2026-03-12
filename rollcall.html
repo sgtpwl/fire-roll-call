@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
 body{
 font-family:Arial;
 margin:0;
@@ -29,8 +28,13 @@ max-width:900px;
 color:white;
 }
 
-.safeBanner{background:#4CAF50;}
-.missingBanner{background:#d32f2f;}
+.safeBanner{
+background:#4CAF50;
+}
+
+.missingBanner{
+background:#d32f2f;
+}
 
 .headerBox{
 max-width:900px;
@@ -97,6 +101,8 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 cursor:pointer;
+gap:10px;
+flex-wrap:wrap;
 }
 
 .personName{
@@ -130,6 +136,17 @@ font-weight:bold;
 margin-bottom:6px;
 }
 
+@media (max-width:700px){
+.personRow{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.safeBtn{
+margin-top:8px;
+width:100%;
+}
+}
 </style>
 </head>
 
@@ -142,7 +159,6 @@ Waiting for drill
 </div>
 
 <div class="headerBox">
-
 <div id="shiftDisplay">Shift: —</div>
 
 <div class="counts">
@@ -150,8 +166,9 @@ Accounted <span id="safeCount">0</span> /
 <span id="totalCount">0</span>
 </div>
 
-<button class="resetBtn" onclick="resetDrill()">START DRILL</button>
+<div id="drillTimer" style="margin-top:8px;font-weight:bold;">Drill not started</div>
 
+<button class="resetBtn" onclick="startDrill()">START DRILL</button>
 </div>
 
 <div id="board" class="section"></div>
@@ -164,7 +181,7 @@ Accounted <span id="safeCount">0</span> /
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+import { getDatabase, ref, onValue, update, set, push, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
 
 const firebaseConfig={
 apiKey:"AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
@@ -181,22 +198,69 @@ const db=getDatabase(app)
 
 const rosterRef=ref(db,"activeShift")
 const shiftInfoRef=ref(db,"shiftInfo")
+const currentDrillRef=ref(db,"currentDrill")
+const reportsRef=ref(db,"drillReports")
 
 let rosterData={}
 let openDepartments={}
+let currentDrill={}
+let shiftInfo={}
+let timerInterval=null
 
 onValue(shiftInfoRef,(snap)=>{
-const data=snap.val()||{}
-if(data.shift){
+shiftInfo=snap.val()||{}
+if(shiftInfo.shift){
 document.getElementById("shiftDisplay").innerText=
-"Shift: "+data.shift+" Shift "+data.team
+"Shift: "+shiftInfo.shift+" Shift "+shiftInfo.team
+}else{
+document.getElementById("shiftDisplay").innerText="Shift: —"
 }
+})
+
+onValue(currentDrillRef,(snap)=>{
+currentDrill=snap.val()||{}
+renderTimer()
 })
 
 onValue(rosterRef,(snapshot)=>{
 rosterData=snapshot.val()||{}
 renderBoard()
+checkForDrillCompletion()
 })
+
+function formatDateTime(ts){
+const d=new Date(ts)
+return d.toLocaleString()
+}
+
+function formatDuration(ms){
+const totalSeconds=Math.floor(ms/1000)
+const minutes=Math.floor(totalSeconds/60)
+const seconds=totalSeconds%60
+return minutes+"m "+seconds+"s"
+}
+
+function renderTimer(){
+const timer=document.getElementById("drillTimer")
+
+if(timerInterval){
+clearInterval(timerInterval)
+timerInterval=null
+}
+
+if(currentDrill.startTime && !currentDrill.endTime){
+const updateTimer=()=>{
+const now=Date.now()
+timer.innerText="Drill running: "+formatDuration(now-currentDrill.startTime)
+}
+updateTimer()
+timerInterval=setInterval(updateTimer,1000)
+}else if(currentDrill.startTime && currentDrill.endTime){
+timer.innerText="Last drill: "+formatDuration(currentDrill.endTime-currentDrill.startTime)
+}else{
+timer.innerText="Drill not started"
+}
+}
 
 function renderBoard(){
 
@@ -244,6 +308,9 @@ const banner=document.getElementById("statusBanner")
 if(total>0 && safeCount===total){
 banner.className="statusBanner safeBanner"
 banner.innerText="🟢 ALL ACCOUNTED FOR"
+}else if(total===0){
+banner.className="statusBanner missingBanner"
+banner.innerText="No active roster loaded"
 }else{
 banner.className="statusBanner missingBanner"
 banner.innerText="🔴 "+(total-safeCount)+" MISSING"
@@ -314,11 +381,11 @@ btn.innerText=person.safe?"SAFE":"MARK SAFE"
 
 btn.onclick=(e)=>{
 e.stopPropagation()
-toggleSafe(person.id,person.safe)
+toggleSafe(person.id,person.safe,person.name)
 }
 
 row.onclick=()=>{
-toggleSafe(person.id,person.safe)
+toggleSafe(person.id,person.safe,person.name)
 }
 
 row.appendChild(name)
@@ -338,18 +405,92 @@ board.appendChild(deptBlock)
 
 }
 
-function toggleSafe(id,current){
-update(ref(db,"activeShift/"+id),{safe:!current})
+async function toggleSafe(id,current,name){
+
+const updates={
+safe:!current
 }
 
-window.resetDrill=function(){
+if(!current && currentDrill.startTime){
+updates.safeTime=Date.now()
+}
+
+if(current){
+updates.safeTime=null
+}
+
+await update(ref(db,"activeShift/"+id),updates)
+}
+
+window.startDrill=async function(){
 
 if(!confirm("Start new drill and clear all SAFE ticks?")) return
 
+const startTime=Date.now()
+
 for(const id in rosterData){
-update(ref(db,"activeShift/"+id),{safe:false})
+await update(ref(db,"activeShift/"+id),{
+safe:false,
+safeTime:null
+})
 }
 
+await set(currentDrillRef,{
+startTime:startTime,
+endTime:null,
+shift:shiftInfo.shift||"",
+team:shiftInfo.team||"",
+staffTotal:Object.keys(rosterData).length
+})
+}
+
+async function checkForDrillCompletion(){
+
+const ids=Object.keys(rosterData)
+
+if(ids.length===0) return
+if(!currentDrill.startTime) return
+if(currentDrill.endTime) return
+
+let allSafe=true
+
+for(const id of ids){
+if(!rosterData[id].safe){
+allSafe=false
+break
+}
+}
+
+if(!allSafe) return
+
+const endTime=Date.now()
+const reportStaff=[]
+
+ids.forEach(id=>{
+reportStaff.push({
+name:rosterData[id].name||"",
+site:rosterData[id].site||"",
+department:rosterData[id].department||"",
+safeTime:rosterData[id].safeTime||null
+})
+})
+
+const reportData={
+shift:currentDrill.shift||shiftInfo.shift||"",
+team:currentDrill.team||shiftInfo.team||"",
+startTime:currentDrill.startTime,
+endTime:endTime,
+totalTimeMs:endTime-currentDrill.startTime,
+totalTimeText:formatDuration(endTime-currentDrill.startTime),
+staffTotal:ids.length,
+staff:reportStaff
+}
+
+await push(reportsRef,reportData)
+
+await update(currentDrillRef,{
+endTime:endTime
+})
 }
 
 </script>
