@@ -1,43 +1,77 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<title>Fire Roll Call</title>
+<title>Fire Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 
 body{
-font-family: Arial, sans-serif;
+font-family: Arial;
 text-align:center;
-padding:40px;
+padding:30px;
+background:#f5f5f5;
+}
+
+h1{
+margin-bottom:30px;
 }
 
 button{
-width:200px;
-height:80px;
-font-size:24px;
-margin:20px;
+width:260px;
+height:60px;
+font-size:18px;
+margin:12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.shiftBtn{
+background:#2196F3;
+color:white;
+}
+
+.rollcallBtn{
+background:#4CAF50;
+color:white;
+}
+
+.adminBtn{
+background:#555;
+color:white;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<h1>Select Warehouse</h1>
+<h1>Fire Management System</h1>
 
-<button onclick="go('BDC')">BDC</button>
-<button onclick="go('CDC')">CDC</button>
+<br>
 
-<script>
+<a href="shift.html">
+<button class="shiftBtn">
+Shift Setup
+</button>
+</a>
 
-function go(site){
-window.location="areas.html?site="+site;
-}
+<br>
 
-</script>
+<a href="rollcall.html">
+<button class="rollcallBtn">
+Fire Roll Call
+</button>
+</a>
+
+<br>
+
+<a href="admin.html">
+<button class="adminBtn">
+Staff Management
+</button>
+</a>
 
 </body>
 </html>
