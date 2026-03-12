@@ -29,13 +29,8 @@ max-width:900px;
 color:white;
 }
 
-.safeBanner{
-background:#4CAF50;
-}
-
-.missingBanner{
-background:#d32f2f;
-}
+.safeBanner{background:#4CAF50;}
+.missingBanner{background:#d32f2f;}
 
 .headerBox{
 max-width:900px;
@@ -135,20 +130,6 @@ font-weight:bold;
 margin-bottom:6px;
 }
 
-@media (max-width:700px){
-
-.personRow{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.safeBtn{
-margin-top:8px;
-width:100%;
-}
-
-}
-
 </style>
 </head>
 
@@ -202,24 +183,19 @@ const rosterRef=ref(db,"activeShift")
 const shiftInfoRef=ref(db,"shiftInfo")
 
 let rosterData={}
+let openDepartments={}
 
 onValue(shiftInfoRef,(snap)=>{
-
 const data=snap.val()||{}
-
 if(data.shift){
 document.getElementById("shiftDisplay").innerText=
 "Shift: "+data.shift+" Shift "+data.team
 }
-
 })
 
 onValue(rosterRef,(snapshot)=>{
-
 rosterData=snapshot.val()||{}
-
 renderBoard()
-
 })
 
 function renderBoard(){
@@ -227,12 +203,11 @@ function renderBoard(){
 const board=document.getElementById("board")
 board.innerHTML=""
 
+const grouped={}
 const missing=[]
 
 let safeCount=0
 let total=0
-
-const grouped={}
 
 for(const id in rosterData){
 
@@ -262,22 +237,16 @@ missing.push(p.name)
 
 document.getElementById("safeCount").innerText=safeCount
 document.getElementById("totalCount").innerText=total
-
-const missingList=document.getElementById("missingList")
-missingList.innerText=missing.length?missing.join(", "):"None"
+document.getElementById("missingList").innerText=missing.length?missing.join(", "):"None"
 
 const banner=document.getElementById("statusBanner")
 
 if(total>0 && safeCount===total){
-
 banner.className="statusBanner safeBanner"
 banner.innerText="🟢 ALL ACCOUNTED FOR"
-
 }else{
-
 banner.className="statusBanner missingBanner"
 banner.innerText="🔴 "+(total-safeCount)+" MISSING"
-
 }
 
 const siteOrder=["BDC","CDC","YARD"]
@@ -295,24 +264,35 @@ Object.keys(grouped[site]).sort().forEach(dept=>{
 
 const staffList=grouped[site][dept]
 
+const deptKey=site+"-"+dept
+
 const deptBlock=document.createElement("div")
 deptBlock.className="deptBlock"
 
 const deptHeader=document.createElement("div")
 deptHeader.className="deptHeader"
-deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
 
 const deptBody=document.createElement("div")
 deptBody.className="deptBody"
 
-deptHeader.onclick=()=>{
-
-if(deptBody.style.display==="none"){
+if(openDepartments[deptKey]){
 deptBody.style.display="block"
 deptHeader.innerText="▲ "+dept+" ("+staffList.length+")"
 }else{
 deptBody.style.display="none"
 deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
+}
+
+deptHeader.onclick=()=>{
+
+if(openDepartments[deptKey]){
+openDepartments[deptKey]=false
+deptBody.style.display="none"
+deptHeader.innerText="▼ "+dept+" ("+staffList.length+")"
+}else{
+openDepartments[deptKey]=true
+deptBody.style.display="block"
+deptHeader.innerText="▲ "+dept+" ("+staffList.length+")"
 }
 
 }
@@ -359,11 +339,7 @@ board.appendChild(deptBlock)
 }
 
 function toggleSafe(id,current){
-
-update(ref(db,"activeShift/"+id),{
-safe:!current
-})
-
+update(ref(db,"activeShift/"+id),{safe:!current})
 }
 
 window.resetDrill=function(){
@@ -371,11 +347,7 @@ window.resetDrill=function(){
 if(!confirm("Start new drill and clear all SAFE ticks?")) return
 
 for(const id in rosterData){
-
-update(ref(db,"activeShift/"+id),{
-safe:false
-})
-
+update(ref(db,"activeShift/"+id),{safe:false})
 }
 
 }
