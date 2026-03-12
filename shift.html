@@ -72,20 +72,12 @@ button{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
 }
 
 .staffLeft{
   display:flex;
   align-items:center;
   gap:10px;
-  flex:1;
-  min-width:220px;
-}
-
-.statusText{
-  font-weight:bold;
 }
 
 .smallText{
@@ -102,9 +94,6 @@ button{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  text-align:left;
 }
 
 .infoBox{
@@ -115,7 +104,6 @@ button{
   border-radius:8px;
   background:#fafafa;
 }
-
 </style>
 </head>
 
@@ -156,6 +144,57 @@ No shift activated yet.
 
 </div>
 
+<div class="section" style="text-align:center;">
+
+<h2>Add Temporary Worker</h2>
+
+<input id="tempName" placeholder="Name">
+
+<br>
+
+<select id="tempDepartment">
+
+<option value="">Select Department</option>
+
+<option value="BDC Picking">BDC Picking</option>
+<option value="BDC MHE">BDC MHE</option>
+<option value="BDC Despatch">BDC Despatch</option>
+<option value="BDC Inbound">BDC Inbound</option>
+<option value="BDC Stock">BDC Stock Team</option>
+
+<option value="CDC Picking">CDC Picking</option>
+<option value="CDC MHE">CDC MHE</option>
+<option value="CDC Despatch">CDC Despatch</option>
+<option value="CDC Inbound">CDC Inbound</option>
+<option value="CDC Stock">CDC Stock Team</option>
+
+<option value="Supervisor">Supervisor</option>
+<option value="Manager">Manager</option>
+
+<option value="Yard Shunters">Yard Shunters</option>
+<option value="Yard Gatehouse">Yard Gatehouse</option>
+
+<option value="Compliance">Compliance</option>
+
+</select>
+
+<br>
+
+<select id="tempSite">
+
+<option value="">Select Site</option>
+<option value="BDC">BDC</option>
+<option value="CDC">CDC</option>
+<option value="YARD">YARD</option>
+
+</select>
+
+<br>
+
+<button onclick="addTemp()">Add Temporary Worker</button>
+
+</div>
+
 <div class="section">
 
 <h2 style="text-align:center;">Loaded Shift Staff</h2>
@@ -186,13 +225,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-  authDomain: "shunt-queue.firebaseapp.com",
-  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "shunt-queue",
-  storageBucket: "shunt-queue.appspot.com",
-  messagingSenderId: "773776993625",
-  appId: "1:773776993625:web:2082ee7a38be041bee7048"
+apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain: "shunt-queue.firebaseapp.com",
+databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "shunt-queue",
+storageBucket: "shunt-queue.appspot.com",
+messagingSenderId: "773776993625",
+appId: "1:773776993625:web:2082ee7a38be041bee7048"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -204,7 +243,6 @@ const shiftInfoRef = ref(db,"shiftInfo");
 
 let staffData={}
 let rosterData={}
-let loadedCandidates=[]
 
 onValue(staffRef,(snap)=>{
  staffData=snap.val()||{}
@@ -219,61 +257,13 @@ onValue(rosterRef,(snap)=>{
 function getRosterNames(){
  const names=[]
  for(const id in rosterData){
-   names.push((rosterData[id].name||"").toLowerCase())
+  names.push((rosterData[id].name||"").toLowerCase())
  }
  return names
 }
 
 function isAlreadyOnRoster(name){
  return getRosterNames().includes(name.toLowerCase())
-}
-
-function renderRoster(){
-
- const list=document.getElementById("roster")
- list.innerHTML=""
-
- const rosterArray=[]
-
- for(const id in rosterData){
-
-  rosterArray.push({
-   id:id,
-   name:rosterData[id].name,
-   department:rosterData[id].department,
-   site:rosterData[id].site
-  })
-
- }
-
- document.getElementById("rosterSummary").innerText =
- rosterArray.length===0
- ? "No one currently added."
- : rosterArray.length+" currently on site."
-
- rosterArray.forEach(person=>{
-
-  const row=document.createElement("div")
-  row.className="staffRow"
-
-  const left=document.createElement("div")
-  left.className="staffLeft"
-  left.innerHTML="<strong>"+person.name+"</strong>"
-
-  const removeBtn=document.createElement("button")
-  removeBtn.innerText="Remove"
-
-  removeBtn.onclick=function(){
-   remove(ref(db,"activeShift/"+person.id))
-  }
-
-  row.appendChild(left)
-  row.appendChild(removeBtn)
-
-  list.appendChild(row)
-
- })
-
 }
 
 window.loadShiftStaff=function(){
@@ -295,37 +285,81 @@ window.loadShiftStaff=function(){
 
  }
 
- loadedCandidates=loaded
-
  document.getElementById("loadedSummary").innerText =
  loaded.length+" staff loaded"
 
- const list=document.getElementById("loadedStaff")
- list.innerHTML=""
+ createGroupedList(loaded)
 
- loaded.forEach(p=>{
+}
 
-  const row=document.createElement("div")
-  row.className="staffRow"
+function createGroupedList(staff){
 
-  const left=document.createElement("div")
-  left.className="staffLeft"
+ const container=document.getElementById("loadedStaff")
+ container.innerHTML=""
 
-  const checkbox=document.createElement("input")
-  checkbox.type="checkbox"
-  checkbox.dataset.name=p.name
-  checkbox.dataset.department=p.department
-  checkbox.dataset.site=p.site
+ const grouped={}
 
-  const text=document.createElement("div")
-  text.innerHTML="<strong>"+p.name+"</strong>"
+ staff.forEach(p=>{
 
-  left.appendChild(checkbox)
-  left.appendChild(text)
+  if(!grouped[p.site]) grouped[p.site]={}
 
-  row.appendChild(left)
+  if(!grouped[p.site][p.department]) grouped[p.site][p.department]=[]
 
-  list.appendChild(row)
+  grouped[p.site][p.department].push(p)
+
+ })
+
+ Object.keys(grouped).forEach(site=>{
+
+  const siteTitle=document.createElement("div")
+  siteTitle.className="siteTitle"
+  siteTitle.innerText=site
+  container.appendChild(siteTitle)
+
+  Object.keys(grouped[site]).forEach(dept=>{
+
+   const deptBlock=document.createElement("div")
+   deptBlock.className="deptBlock"
+
+   const deptHeader=document.createElement("div")
+   deptHeader.className="deptHeader"
+   deptHeader.innerText=dept
+
+   const deptBody=document.createElement("div")
+   deptBody.className="deptBody"
+
+   grouped[site][dept].forEach(p=>{
+
+    const row=document.createElement("div")
+    row.className="staffRow"
+
+    const left=document.createElement("div")
+    left.className="staffLeft"
+
+    const checkbox=document.createElement("input")
+    checkbox.type="checkbox"
+    checkbox.dataset.name=p.name
+    checkbox.dataset.department=p.department
+    checkbox.dataset.site=p.site
+
+    const text=document.createElement("div")
+    text.innerHTML="<strong>"+p.name+"</strong>"
+
+    left.appendChild(checkbox)
+    left.appendChild(text)
+
+    row.appendChild(left)
+
+    deptBody.appendChild(row)
+
+   })
+
+   deptBlock.appendChild(deptHeader)
+   deptBlock.appendChild(deptBody)
+
+   container.appendChild(deptBlock)
+
+  })
 
  })
 
@@ -333,10 +367,8 @@ window.loadShiftStaff=function(){
 
 window.saveShiftRoster=function(){
 
- const shift=document.getElementById("shift").value
- const team=document.getElementById("team").value
-
  const checkboxes=document.querySelectorAll("#loadedStaff input[type='checkbox']")
+
  const rosterNames=getRosterNames()
 
  checkboxes.forEach(box=>{
@@ -360,11 +392,6 @@ window.saveShiftRoster=function(){
 
  })
 
- set(shiftInfoRef,{
-  shift:shift,
-  team:team
- })
-
  alert("Shift roster saved")
 
 }
@@ -376,8 +403,8 @@ window.searchStaff=function(){
 function renderSearchResults(){
 
  const search=document.getElementById("searchBox").value.toLowerCase()
- const results=document.getElementById("searchResults")
 
+ const results=document.getElementById("searchResults")
  results.innerHTML=""
 
  if(search.length<2)return
@@ -392,13 +419,13 @@ function renderSearchResults(){
    row.className="searchRow"
 
    const text=document.createElement("div")
-   text.innerHTML="<strong>"+p.name+"</strong><br><span class='smallText'>"+p.department+"</span>"
+   text.innerHTML="<strong>"+p.name+"</strong><br>"+p.department
 
    const right=document.createElement("div")
 
    if(isAlreadyOnRoster(p.name)){
 
-    right.innerHTML="<span class='statusText'>✔ Already on shift</span>"
+    right.innerHTML="<b>✔ Already on shift</b>"
 
    }else{
 
@@ -428,6 +455,88 @@ function renderSearchResults(){
   }
 
  }
+
+}
+
+window.addTemp=function(){
+
+ const name=document.getElementById("tempName").value.trim()
+ const dept=document.getElementById("tempDepartment").value
+ const site=document.getElementById("tempSite").value
+
+ if(name==""||dept==""||site==""){
+
+  alert("Please fill name, department and site")
+
+  return
+
+ }
+
+ if(isAlreadyOnRoster(name)){
+
+  alert("Already on shift")
+
+  return
+
+ }
+
+ push(rosterRef,{
+  name:name,
+  department:dept,
+  site:site,
+  safe:false
+ })
+
+ document.getElementById("tempName").value=""
+
+}
+
+function renderRoster(){
+
+ const list=document.getElementById("roster")
+
+ list.innerHTML=""
+
+ const rosterArray=[]
+
+ for(const id in rosterData){
+
+  rosterArray.push({
+   id:id,
+   name:rosterData[id].name,
+   department:rosterData[id].department,
+   site:rosterData[id].site
+  })
+
+ }
+
+ document.getElementById("rosterSummary").innerText =
+ rosterArray.length===0
+ ? "No one currently added."
+ : rosterArray.length+" currently on site."
+
+ rosterArray.forEach(p=>{
+
+  const row=document.createElement("div")
+  row.className="staffRow"
+
+  const left=document.createElement("div")
+  left.className="staffLeft"
+  left.innerHTML="<strong>"+p.name+"</strong>"
+
+  const removeBtn=document.createElement("button")
+  removeBtn.innerText="Remove"
+
+  removeBtn.onclick=function(){
+   remove(ref(db,"activeShift/"+p.id))
+  }
+
+  row.appendChild(left)
+  row.appendChild(removeBtn)
+
+  list.appendChild(row)
+
+ })
 
 }
 
