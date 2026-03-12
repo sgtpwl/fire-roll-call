@@ -67,7 +67,7 @@ border:1px solid #ccc;
 
 <br>
 
-<button onclick="addStaff()">Add Staff</button>
+<button id="addBtn">Add Staff</button>
 
 </div>
 
@@ -82,16 +82,13 @@ import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyACwPAzBK_TFOyIuuI0iNzy_9zW-CKA7m4",
-  authDomain: "shunt-queue.firebaseapp.com",
-  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "shunt-queue",
-  storageBucket: "shunt-queue.appspot.com",
-  messagingSenderId: "773776993625",
-  appId: "1:773776993625:web:2082ee7a38be041bee7048"
-};
-
-firebase.initializeApp(firebaseConfig);
+apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain: "shunt-queue.firebaseapp.com",
+databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "shunt-queue",
+storageBucket: "shunt-queue.appspot.com",
+messagingSenderId: "773776993625",
+appId: "1:773776993625:web:2082ee7a38be041bee7048"
 
 }
 
@@ -100,10 +97,12 @@ const db = getDatabase(app)
 
 const staffRef = ref(db,"fireStaff")
 
-function addStaff(){
+document.getElementById("addBtn").onclick = function(){
 
 const name = document.getElementById("name").value
 const area = document.getElementById("area").value
+
+if(name==="") return
 
 push(staffRef,{
 name:name,
