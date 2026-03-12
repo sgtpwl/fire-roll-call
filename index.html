@@ -14,7 +14,7 @@ background:#f5f5f5;
 }
 
 h1{
-margin-bottom:30px;
+margin-bottom:20px;
 }
 
 button{
@@ -27,19 +27,23 @@ border-radius:8px;
 cursor:pointer;
 }
 
-.shiftBtn{
-background:#2196F3;
-color:white;
+.shiftBtn{background:#2196F3;color:white;}
+.rollcallBtn{background:#4CAF50;color:white;}
+.adminBtn{background:#555;color:white;}
+
+.statusPanel{
+max-width:400px;
+margin:20px auto;
+padding:16px;
+background:white;
+border:1px solid #ccc;
+border-radius:10px;
 }
 
-.rollcallBtn{
-background:#4CAF50;
-color:white;
-}
-
-.adminBtn{
-background:#555;
-color:white;
+.bigNumber{
+font-size:26px;
+font-weight:bold;
+margin-top:6px;
 }
 
 </style>
@@ -49,29 +53,89 @@ color:white;
 
 <h1>Fire Management System</h1>
 
-<br>
+<div class="statusPanel">
+
+<div id="shiftStatus">Shift: —</div>
+
+<div class="bigNumber">
+<span id="safeCount">0</span> /
+<span id="totalCount">0</span>
+Accounted
+</div>
+
+<div id="missingCount">Missing: 0</div>
+
+</div>
 
 <a href="shift.html">
-<button class="shiftBtn">
-Shift Setup
-</button>
+<button class="shiftBtn">Shift Setup</button>
 </a>
 
 <br>
 
 <a href="rollcall.html">
-<button class="rollcallBtn">
-Fire Roll Call
-</button>
+<button class="rollcallBtn">Fire Roll Call</button>
 </a>
 
 <br>
 
 <a href="admin.html">
-<button class="adminBtn">
-Staff Management
-</button>
+<button class="adminBtn">Staff Management</button>
 </a>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+
+const firebaseConfig={
+apiKey:"AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain:"shunt-queue.firebaseapp.com",
+databaseURL:"https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId:"shunt-queue",
+storageBucket:"shunt-queue.appspot.com",
+messagingSenderId:"773776993625",
+appId:"1:773776993625:web:2082ee7a38be041bee7048"
+}
+
+const app=initializeApp(firebaseConfig)
+const db=getDatabase(app)
+
+const rosterRef=ref(db,"activeShift")
+const shiftRef=ref(db,"shiftInfo")
+
+onValue(shiftRef,(snap)=>{
+const data=snap.val()||{}
+if(data.shift){
+document.getElementById("shiftStatus").innerText=
+"Shift: "+data.shift+" "+data.team
+}
+})
+
+onValue(rosterRef,(snap)=>{
+
+const data=snap.val()||{}
+
+let total=0
+let safe=0
+
+for(const id in data){
+
+total++
+
+if(data[id].safe){
+safe++
+}
+
+}
+
+document.getElementById("totalCount").innerText=total
+document.getElementById("safeCount").innerText=safe
+document.getElementById("missingCount").innerText="Missing: "+(total-safe)
+
+})
+
+</script>
 
 </body>
 </html>
