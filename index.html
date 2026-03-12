@@ -1,1 +1,43 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fire Roll Call</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+text-align:center;
+padding:40px;
+}
+
+button{
+width:200px;
+height:80px;
+font-size:24px;
+margin:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Select Warehouse</h1>
+
+<button onclick="go('BDC')">BDC</button>
+<button onclick="go('CDC')">CDC</button>
+
+<script>
+
+function go(site){
+window.location="areas.html?site="+site;
+}
+
+</script>
+
+</body>
+</html>
