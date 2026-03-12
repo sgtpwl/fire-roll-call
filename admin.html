@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
 body{
 font-family: Arial;
 padding:20px;
@@ -13,7 +12,7 @@ text-align:center;
 }
 
 input, select{
-width:250px;
+width:260px;
 height:40px;
 font-size:18px;
 margin:10px;
@@ -30,7 +29,6 @@ margin:10px;
 padding:10px;
 border:1px solid #ccc;
 }
-
 </style>
 
 </head>
@@ -63,6 +61,9 @@ border:1px solid #ccc;
 <option value="CDC_SUPERVISORS">CDC Supervisors</option>
 <option value="CDC_MANAGERS">CDC Managers</option>
 
+<option value="YARD_SHUNTERS">Shunters</option>
+<option value="YARD_GATEHOUSE">Gatehouse</option>
+
 </select>
 
 <br>
@@ -81,63 +82,57 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-authDomain: "shunt-queue.firebaseapp.com",
-databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-projectId: "shunt-queue",
-storageBucket: "shunt-queue.appspot.com",
-messagingSenderId: "773776993625",
-appId: "1:773776993625:web:2082ee7a38be041bee7048"
-
+  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+  authDomain: "shunt-queue.firebaseapp.com",
+  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "shunt-queue",
+  storageBucket: "shunt-queue.appspot.com",
+  messagingSenderId: "773776993625",
+  appId: "1:773776993625:web:2082ee7a38be041bee7048"
 }
 
 const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
+const staffRef = ref(db, "fireStaff")
 
-const staffRef = ref(db,"fireStaff")
+document.getElementById("addBtn").onclick = function () {
+  const name = document.getElementById("name").value.trim()
+  const area = document.getElementById("area").value
 
-document.getElementById("addBtn").onclick = function(){
+  if (name === "") return
 
-const name = document.getElementById("name").value
-const area = document.getElementById("area").value
+  push(staffRef, {
+    name: name,
+    area: area
+  })
 
-if(name==="") return
-
-push(staffRef,{
-name:name,
-area:area
-})
-
-document.getElementById("name").value=""
-
+  document.getElementById("name").value = ""
 }
 
-onValue(staffRef,(snapshot)=>{
+onValue(staffRef, (snapshot) => {
+  const data = snapshot.val()
+  const list = document.getElementById("staffList")
+  list.innerHTML = ""
 
-const data = snapshot.val()
+  if (!data) {
+    list.innerHTML = "<p>No staff added yet.</p>"
+    return
+  }
 
-const list = document.getElementById("staffList")
-list.innerHTML=""
+  for (const id in data) {
+    const row = document.createElement("div")
+    row.className = "staffRow"
 
-for(const id in data){
+    row.innerHTML =
+      data[id].name + " — " + data[id].area +
+      ' <button onclick="deleteStaff(\'' + id + '\')">Delete</button>'
 
-const row = document.createElement("div")
-row.className="staffRow"
-
-row.innerHTML = data[id].name + " — " + data[id].area +
-' <button onclick="deleteStaff(\''+id+'\')">Delete</button>'
-
-list.appendChild(row)
-
-}
-
+    list.appendChild(row)
+  }
 })
 
-window.deleteStaff = function(id){
-
-remove(ref(db,"fireStaff/"+id))
-
+window.deleteStaff = function (id) {
+  remove(ref(db, "fireStaff/" + id))
 }
 
 </script>
