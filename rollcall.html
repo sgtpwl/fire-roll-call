@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +9,7 @@ body{
   font-family: Arial, sans-serif;
   margin:0;
   padding:20px;
-  background:#f7f7f7;
+  background:#f5f5f5;
 }
 
 h1{
@@ -18,38 +17,67 @@ h1{
   margin-top:0;
 }
 
-.headerBox{
-  max-width:1000px;
+.statusBanner{
+  text-align:center;
+  font-size:26px;
+  font-weight:bold;
+  padding:14px;
+  border-radius:10px;
   margin:10px auto 20px auto;
+  max-width:900px;
+  color:white;
+}
+
+.safeBanner{
+  background:#4CAF50;
+}
+
+.missingBanner{
+  background:#d32f2f;
+}
+
+.headerBox{
+  max-width:900px;
+  margin:0 auto 20px auto;
   padding:12px;
+  background:white;
   border:1px solid #ccc;
   border-radius:8px;
-  background:white;
   text-align:center;
 }
 
 .counts{
   font-size:20px;
-  margin-top:8px;
+  margin-top:6px;
+}
+
+.resetBtn{
+  margin-top:10px;
+  padding:12px 20px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:#ff9800;
+  cursor:pointer;
 }
 
 .section{
-  max-width:1000px;
-  margin:18px auto;
+  max-width:900px;
+  margin:20px auto;
 }
 
 .siteTitle{
   font-size:24px;
   font-weight:bold;
-  margin:16px 0 8px 0;
+  margin:18px 0 8px 0;
 }
 
 .deptBlock{
   border:1px solid #ccc;
   border-radius:8px;
   margin:10px 0;
-  overflow:hidden;
   background:white;
+  overflow:hidden;
 }
 
 .deptHeader{
@@ -59,31 +87,32 @@ h1{
 }
 
 .deptBody{
-  padding:8px 12px 12px 12px;
+  padding:10px;
 }
 
 .personRow{
+  border:1px solid #ddd;
+  border-radius:6px;
+  margin:8px 0;
+  padding:12px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  border:1px solid #ddd;
-  border-radius:6px;
-  padding:10px;
-  margin:8px 0;
+  cursor:pointer;
+  gap:10px;
   flex-wrap:wrap;
 }
 
 .personName{
   font-weight:bold;
+  font-size:16px;
 }
 
 .safeBtn{
-  background:#e0e0e0;
+  padding:8px 14px;
   border:none;
-  padding:10px 16px;
-  font-size:15px;
   border-radius:6px;
-  cursor:pointer;
+  background:#e0e0e0;
 }
 
 .safeBtn.safe{
@@ -91,23 +120,13 @@ h1{
   color:white;
 }
 
-.resetBtn{
-  background:#ff9800;
-  border:none;
-  padding:12px 20px;
-  font-size:16px;
-  border-radius:6px;
-  cursor:pointer;
-  margin-top:10px;
-}
-
 .missingBox{
-  max-width:1000px;
+  max-width:900px;
   margin:20px auto;
   padding:12px;
+  background:white;
   border:1px solid #ccc;
   border-radius:8px;
-  background:white;
 }
 
 .missingTitle{
@@ -120,9 +139,10 @@ h1{
     flex-direction:column;
     align-items:flex-start;
   }
+
   .safeBtn{
-    width:100%;
     margin-top:8px;
+    width:100%;
   }
 }
 </style>
@@ -132,10 +152,15 @@ h1{
 
 <h1>🔥 Fire Roll Call</h1>
 
+<div id="statusBanner" class="statusBanner missingBanner">
+  Waiting for drill
+</div>
+
 <div class="headerBox">
   <div id="shiftDisplay">Shift: —</div>
+
   <div class="counts">
-    Accounted: <span id="safeCount">0</span> /
+    Accounted <span id="safeCount">0</span> /
     <span id="totalCount">0</span>
   </div>
 
@@ -150,154 +175,162 @@ h1{
 </div>
 
 <script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
-authDomain: "shunt-queue.firebaseapp.com",
-databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
-projectId: "shunt-queue",
-storageBucket: "shunt-queue.appspot.com",
-messagingSenderId: "773776993625",
-appId: "1:773776993625:web:2082ee7a38be041bee7048"
-}
+  apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+  authDomain: "shunt-queue.firebaseapp.com",
+  databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "shunt-queue",
+  storageBucket: "shunt-queue.appspot.com",
+  messagingSenderId: "773776993625",
+  appId: "1:773776993625:web:2082ee7a38be041bee7048"
+};
 
-const app = initializeApp(firebaseConfig)
-const db = getDatabase(app)
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-const rosterRef = ref(db,"activeShift")
-const shiftInfoRef = ref(db,"shiftInfo")
+const rosterRef = ref(db, "activeShift");
+const shiftInfoRef = ref(db, "shiftInfo");
 
-let rosterData = {}
+let rosterData = {};
 
-onValue(shiftInfoRef,(snap)=>{
-const data=snap.val()||{}
-if(data.shift){
-document.getElementById("shiftDisplay").innerText =
-"Shift: "+data.shift+" Shift "+data.team
-}
-})
+onValue(shiftInfoRef, (snap) => {
+  const data = snap.val() || {};
 
-onValue(rosterRef,(snapshot)=>{
+  if(data.shift){
+    document.getElementById("shiftDisplay").innerText =
+      "Shift: " + data.shift + " Shift " + data.team;
+  } else {
+    document.getElementById("shiftDisplay").innerText = "Shift: —";
+  }
+});
 
-rosterData=snapshot.val()||{}
-
-renderBoard()
-
-})
+onValue(rosterRef, (snapshot) => {
+  rosterData = snapshot.val() || {};
+  renderBoard();
+});
 
 function renderBoard(){
+  const board = document.getElementById("board");
+  board.innerHTML = "";
 
-const board=document.getElementById("board")
-board.innerHTML=""
+  const missing = [];
+  let safeCount = 0;
+  let total = 0;
 
-const missing=[]
-let safeCount=0
-let total=0
+  const grouped = {};
 
-const grouped={}
+  for(const id in rosterData){
+    const p = rosterData[id];
 
-for(const id in rosterData){
+    const site = p.site || "Unknown";
+    const dept = p.department || "Unknown";
 
-const p=rosterData[id]
+    if(!grouped[site]) grouped[site] = {};
+    if(!grouped[site][dept]) grouped[site][dept] = [];
 
-const site=p.site||"Unknown"
-const dept=p.department||"Unknown"
+    grouped[site][dept].push({
+      id: id,
+      name: p.name,
+      safe: p.safe
+    });
 
-if(!grouped[site]) grouped[site]={}
-if(!grouped[site][dept]) grouped[site][dept]=[]
+    total++;
 
-grouped[site][dept].push({
-id:id,
-name:p.name,
-safe:p.safe
-})
+    if(p.safe){
+      safeCount++;
+    } else {
+      missing.push(p.name);
+    }
+  }
 
-total++
+  document.getElementById("safeCount").innerText = safeCount;
+  document.getElementById("totalCount").innerText = total;
+  document.getElementById("missingList").innerText = missing.length ? missing.join(", ") : "None";
 
-if(p.safe){
-safeCount++
-}else{
-missing.push(p.name)
+  const banner = document.getElementById("statusBanner");
+
+  if(total > 0 && safeCount === total){
+    banner.className = "statusBanner safeBanner";
+    banner.innerText = "🟢 ALL ACCOUNTED FOR";
+  } else if(total === 0){
+    banner.className = "statusBanner missingBanner";
+    banner.innerText = "No active roster loaded";
+  } else {
+    banner.className = "statusBanner missingBanner";
+    banner.innerText = "🔴 " + (total - safeCount) + " MISSING";
+  }
+
+  Object.keys(grouped).sort().forEach(site => {
+    const siteTitle = document.createElement("div");
+    siteTitle.className = "siteTitle";
+    siteTitle.innerText = site;
+    board.appendChild(siteTitle);
+
+    Object.keys(grouped[site]).sort().forEach(dept => {
+      const deptBlock = document.createElement("div");
+      deptBlock.className = "deptBlock";
+
+      const deptHeader = document.createElement("div");
+      deptHeader.className = "deptHeader";
+      deptHeader.innerText = dept;
+
+      const deptBody = document.createElement("div");
+      deptBody.className = "deptBody";
+
+      grouped[site][dept]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(person => {
+          const row = document.createElement("div");
+          row.className = "personRow";
+
+          const name = document.createElement("div");
+          name.className = "personName";
+          name.innerText = person.name;
+
+          const btn = document.createElement("button");
+          btn.className = "safeBtn" + (person.safe ? " safe" : "");
+          btn.innerText = person.safe ? "SAFE" : "MARK SAFE";
+
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            toggleSafe(person.id, person.safe);
+          };
+
+          row.onclick = () => {
+            toggleSafe(person.id, person.safe);
+          };
+
+          row.appendChild(name);
+          row.appendChild(btn);
+
+          deptBody.appendChild(row);
+        });
+
+      deptBlock.appendChild(deptHeader);
+      deptBlock.appendChild(deptBody);
+      board.appendChild(deptBlock);
+    });
+  });
 }
 
+function toggleSafe(id, current){
+  update(ref(db, "activeShift/" + id), {
+    safe: !current
+  });
 }
 
-document.getElementById("safeCount").innerText=safeCount
-document.getElementById("totalCount").innerText=total
+window.resetDrill = function(){
+  if(!confirm("Start new drill and clear all SAFE ticks?")) return;
 
-const missingList=document.getElementById("missingList")
-missingList.innerText=missing.length?missing.join(", "):"None"
-
-Object.keys(grouped).sort().forEach(site=>{
-
-const siteTitle=document.createElement("div")
-siteTitle.className="siteTitle"
-siteTitle.innerText=site
-board.appendChild(siteTitle)
-
-Object.keys(grouped[site]).sort().forEach(dept=>{
-
-const deptBlock=document.createElement("div")
-deptBlock.className="deptBlock"
-
-const deptHeader=document.createElement("div")
-deptHeader.className="deptHeader"
-deptHeader.innerText=dept
-
-const deptBody=document.createElement("div")
-deptBody.className="deptBody"
-
-grouped[site][dept]
-.sort((a,b)=>a.name.localeCompare(b.name))
-.forEach(person=>{
-
-const row=document.createElement("div")
-row.className="personRow"
-
-const name=document.createElement("div")
-name.className="personName"
-name.innerText=person.name
-
-const btn=document.createElement("button")
-btn.className="safeBtn"+(person.safe?" safe":"")
-btn.innerText=person.safe?"SAFE":"MARK SAFE"
-
-btn.onclick=()=>{
-update(ref(db,"activeShift/"+person.id),{
-safe:!person.safe
-})
-}
-
-row.appendChild(name)
-row.appendChild(btn)
-
-deptBody.appendChild(row)
-
-})
-
-deptBlock.appendChild(deptHeader)
-deptBlock.appendChild(deptBody)
-board.appendChild(deptBlock)
-
-})
-
-})
-
-}
-
-window.resetDrill=function(){
-
-if(!confirm("Start new drill and clear all SAFE ticks?")) return
-
-for(const id in rosterData){
-update(ref(db,"activeShift/"+id),{safe:false})
-}
-
-}
-
+  for(const id in rosterData){
+    update(ref(db, "activeShift/" + id), {
+      safe: false
+    });
+  }
+};
 </script>
 
 </body>
