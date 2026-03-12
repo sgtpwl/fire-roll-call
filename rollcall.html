@@ -57,7 +57,13 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10
 
 const firebaseConfig = {
 
-YOUR_FIREBASE_CONFIG_HERE
+apiKey: "AIzaSyACWPazBK_TFoYIuuI0iNzy_9zw-CKA7m4",
+authDomain: "shunt-queue.firebaseapp.com",
+databaseURL: "https://shunt-queue-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "shunt-queue",
+storageBucket: "shunt-queue.appspot.com",
+messagingSenderId: "773776993625",
+appId: "1:773776993625:web:2082ee7a38be041bee7048"
 
 }
 
@@ -69,9 +75,9 @@ const area = params.get("area")
 
 document.getElementById("title").innerText = area.replace("_"," ")
 
-const list = document.getElementById("list")
-
 const staffRef = ref(db,"fireStaff")
+
+const list = document.getElementById("list")
 
 let accounted = 0
 let total = 0
@@ -81,6 +87,7 @@ onValue(staffRef,(snapshot)=>{
 const data = snapshot.val()
 
 list.innerHTML=""
+
 accounted = 0
 total = 0
 
@@ -120,7 +127,8 @@ update()
 
 function update(){
 
-document.getElementById("counter").innerText = accounted + " / " + total + " accounted"
+document.getElementById("counter").innerText =
+accounted + " / " + total + " accounted"
 
 }
 
