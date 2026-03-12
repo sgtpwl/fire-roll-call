@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Roll Call</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+padding:20px;
+text-align:center;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+#counter{
+font-size:22px;
+margin-bottom:20px;
+}
+
+.person{
+width:100%;
+max-width:400px;
+margin:10px auto;
+padding:15px;
+font-size:20px;
+border:1px solid #ccc;
+border-radius:6px;
+cursor:pointer;
+background:#f2f2f2;
+}
+
+.safe{
+background:#4CAF50;
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1 id="title"></h1>
+
+<div id="counter">0 / 0 accounted</div>
+
+<div id="list"></div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search)
+const area = params.get("area")
+
+document.getElementById("title").innerText = area.replace("_"," ")
+
+const staff = [
+"John Smith",
+"Dave Taylor",
+"Emma Reed",
+"Mike Clark",
+"Chris Cole",
+"Jake Long"
+]
+
+let accounted = 0
+
+const list = document.getElementById("list")
+
+staff.forEach(name => {
+
+const div = document.createElement("div")
+div.className="person"
+div.innerText=name
+
+div.onclick=function(){
+
+if(!div.classList.contains("safe")){
+div.classList.add("safe")
+accounted++
+}else{
+div.classList.remove("safe")
+accounted--
+}
+
+update()
+
+}
+
+list.appendChild(div)
+
+})
+
+function update(){
+
+document.getElementById("counter").innerText = accounted + " / " + staff.length + " accounted"
+
+}
+
+update()
+
+</script>
+
+</body>
+</html>
